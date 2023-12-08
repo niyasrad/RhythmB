@@ -32,4 +32,3 @@ pip install -r requirements.txt
 ```bash
 uvicorn app:app --reload --port 8080
 ```
-
