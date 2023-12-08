@@ -6,6 +6,7 @@ python-dotenv
 sqlalchemy
 pydantic
 pydantic[email]
-passlib[bcrpyt]
+passlib
+bcrypt
 python-jose
 pre-commit
