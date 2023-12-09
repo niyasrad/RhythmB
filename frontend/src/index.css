@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Urbanist:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Urbanist', sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+:root {
+
+  --primary-color: #0CC0DF;
+  --secondary-color: #5CE1E6;
+
+  --large-font-size: 2.5rem;
+  --medium-font-size: 1.5rem;
+  --small-font-size: 1.1rem;
+
+  --primary-font-color: #000000;
+  --secondary-font-color: #FFFFFF;
+
+  --primary-background-color: #000000;
+  --secondary-background-color: #181818;
+  --tertiary-background-color: #D0D0D0;
+
+  --border-radius-large: 1rem;
+  --border-radius-medium: 0.5rem;
+  --border-radius-small: 0.25rem;
+
+}
+
+h1 {
+  font-size: var(--large-font-size);
+  letter-spacing: -0.05rem;
+}
+
+h2 {
+  font-size: var(--medium-font-size);
+  letter-spacing: -0.02rem;
+}
+
+h3 {
+  font-size: var(--small-font-size);
+  letter-spacing: 0;
+}
