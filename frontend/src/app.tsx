@@ -30,14 +30,14 @@ function AppWrapper({ children }: { children: React.ReactNode }) {
   }
 
   useLayoutEffect(() => {
-    
+
     const token = localStorage.getItem("token")
 
     if (!token) {
       setIsLoading(false)
       return
     }
-    
+
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
     axios.get(import.meta.env.VITE_BASE_API + '/user/profile')
     .then((res) => {

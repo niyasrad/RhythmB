@@ -3,7 +3,7 @@ import { AuthContent, AuthForm, AuthFormField, AuthFormFields, AuthFormInput, Au
 import logo_large from '../../assets/logo/rhythmb.svg';
 import logo_small from '../../assets/logo/rb.svg';
 import { useNavigate } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGlobalContext } from "../../contexts/global.context";
 
 
@@ -24,10 +24,20 @@ export interface InputField {
 
 
 export default function Auth({ inputFields, authFormat, handleInputChange, handleFormSubmit }: AuthProps) {
-    
+
     const navigate = useNavigate()
-    
+
     const { isLoggedIn, isLoading } = useGlobalContext()
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const handleAuthSubmit = async () => {
+        if (loading) {
+            return
+        }
+        setLoading(true)
+        await handleFormSubmit()
+        setLoading(false)
+    }
 
     useEffect(() => {
         if (isLoggedIn && !isLoading) {
@@ -38,7 +48,7 @@ export default function Auth({ inputFields, authFormat, handleInputChange, handl
     return (
         <AuthWrapper>
             <AuthContent>
-                <AuthHeader 
+                <AuthHeader
                     src={logo_large}
                     alt="RhythmB"
                 />
@@ -61,7 +71,12 @@ export default function Auth({ inputFields, authFormat, handleInputChange, handl
                         ))
                     }
                     </AuthFormFields>
-                    <AuthSubmit onClick={handleFormSubmit}><h2>Vibe!</h2></AuthSubmit>
+                    <AuthSubmit
+                        onClick={handleAuthSubmit}
+                        $loading={loading}
+                    >
+                        <h2>Vibe!</h2>
+                    </AuthSubmit>
                     </AuthForm>
                     <AuthTrademark>
                         {
@@ -71,7 +86,7 @@ export default function Auth({ inputFields, authFormat, handleInputChange, handl
                                 <AuthSwitch>Already have an account? <span onClick={() => navigate('/sign-in')}>Sign In</span></AuthSwitch>
                             )
                         }
-                        <AuthLogo 
+                        <AuthLogo
                             src={logo_small}
                             alt="RhythmB Logo"
                         />

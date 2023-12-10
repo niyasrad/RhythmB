@@ -1,9 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 
 from core.models.user import User
 from core.schemas.user import User as UserSchema, UserOpt as UserOptSchema
 from core.utils.dependencies import get_db
+from core.utils.errors import (
+    handle_exception,
+    conflict_error,
+    not_found_error,
+    credential_error,
+)
 from core.utils.auth import (
     pwd_context,
     verify_password,
@@ -26,13 +32,9 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
     """
 
     if check_existing_user(user.username, db):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Username already exists!"
-        )
+        raise conflict_error("username")
     if check_existing_user(user.email, db):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="E-mail already exists!"
-        )
+        raise conflict_error("email")
 
     hashed_password = pwd_context.hash(user.password)
 
@@ -50,9 +52,7 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
             "data": {"token": access_token, "username": user.username},
         }
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        raise handle_exception(e)
 
 
 @router.post("/sign-in", status_code=status.HTTP_200_OK)
@@ -65,14 +65,10 @@ async def sign_in(user: UserOptSchema, db: Session = Depends(get_db)):
     user_find = check_existing_user(user.creds, db)
 
     if user_find is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found!"
-        )
+        raise not_found_error("user")
 
     if not verify_password(user.password, user_find.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password!"
-        )
+        raise credential_error()
 
     access_token = create_access_token(data={"username": user_find.username})
 
@@ -101,6 +97,4 @@ async def get_profile(request: Request, db: Session = Depends(get_db)):
             "data": {"username": user.username, "email": user.email},
         }
     except Exception as e:
-        return HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
-        )
+        return handle_exception(e)
