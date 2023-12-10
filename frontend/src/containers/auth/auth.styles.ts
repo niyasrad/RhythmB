@@ -29,7 +29,7 @@ export const AuthContent = styled.div`
 
 export const AuthHeader = styled.img`
     width: 10rem;
-    
+
     object-fit: contain;
     overflow: hidden;
 `
@@ -67,7 +67,7 @@ export const AuthForm = styled.div`
 
 export const AuthTrademark = styled.div`
     width: 100%;
-    
+
     border-left: 0.01rem solid var(--tertiary-background-color);
 
     display: flex;
@@ -83,7 +83,7 @@ export const AuthTrademark = styled.div`
 
 export const AuthSwitch = styled.h3`
     max-width: 80%;
-    
+
     font-weight: 300;
     text-align: center;
 
@@ -119,7 +119,7 @@ export const AuthSpec = styled.h2`
 
 export const AuthFormFields = styled.div`
     width: 100%;
-    
+
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -150,11 +150,11 @@ export const AuthFormInput = styled.input`
 
     padding: 0.5rem;
     box-sizing: border-box;
-    
+
     background-color: var(--tertiary-background-color);
 `
 
-export const AuthSubmit = styled.button`
+export const AuthSubmit = styled.button<{ $loading: boolean }>`
     width: 10rem;
 
     align-self: flex-end;
@@ -162,12 +162,13 @@ export const AuthSubmit = styled.button`
 
     padding: 0.2rem;
     box-sizing: border-box;
-    
+
     border: 0.2rem solid var(--primary-color);
     border-radius: var(--border-radius-large);
     background-color: var(--primary-background-color);
 
-    cursor: pointer;
+    opacity: ${props => props.$loading ? 0.5 : 1};
+    cursor: ${props => props.$loading ? "default" : "pointer"};
 
     h2 {
         font-weight: 600;

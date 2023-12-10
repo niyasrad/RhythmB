@@ -4,6 +4,7 @@ import axios from "axios"
 import { toast } from "react-toastify"
 import { useGlobalContext } from "../../contexts/global.context"
 import { useNavigate } from "react-router"
+import { handleAPIError } from "../../utils/errors.util"
 
 export interface SignInForm {
     creds: string,
@@ -14,7 +15,7 @@ export default function SignIn() {
 
     const { handleLogIn } = useGlobalContext()
     const navigate = useNavigate()
-    
+
     const [form, setForm] = useState<SignInForm>({
         creds: "",
         password: ""
@@ -25,7 +26,7 @@ export default function SignIn() {
             ...form,
             [e.target.name]: e.target.value
         })
-    }    
+    }
 
     const inputFields: InputField[] = [
         {
@@ -52,22 +53,30 @@ export default function SignIn() {
                 return
             }
         }
-        
-        axios.post(import.meta.env.VITE_BASE_API + '/user/sign-in', form)
-        .then((res) => {
+
+        try {
+
+            const res = await axios.post(import.meta.env.VITE_BASE_API + '/user/sign-in', form)
             const response = res.data
+
             handleLogIn!(response.data.token, response.data.username)
-            navigate('/')
             toast.success("Logged In!")
-        })
-        .catch(() => {
-            toast.error("Something went wrong!")
-        })
+            navigate('/')
+
+        } catch(e) {
+
+            if (axios.isAxiosError(e)) {
+                toast.error(handleAPIError(e))
+            } else {
+                toast.error("Something went wrong!")
+            }
+
+        }
 
     }
 
     return (
-        <Auth 
+        <Auth
             inputFields={inputFields}
             authFormat="In"
             handleInputChange={handleInputChange}

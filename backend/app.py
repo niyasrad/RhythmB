@@ -20,7 +20,7 @@ app.include_router(user.router)
 
 
 @app.get("/", status_code=200, tags=["Base"])
-def get_status() -> dict:
+def get_status():
     """
     Returns the status of the server.
     """
