@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, status, Request
+import requests
+import os
+
+from fastapi import APIRouter, Depends, status, Request, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
 from core.models.user import User, UserRole
@@ -126,3 +129,66 @@ async def get_ratings(request: Request, db: Session = Depends(get_db)):
             ]
         },
     }
+
+
+@router.post(
+    "/add-picture",
+    dependencies=[Depends(authenticate_common)],
+    status_code=status.HTTP_200_OK,
+)
+async def add_picture(
+    request: Request, file: UploadFile = File(None), img_url: str = Form(None)
+):
+
+    """
+    Adds a profile picture to the user.
+    """
+    user = request.state.user
+    file_name = f"{user.id}.png"
+
+    os.makedirs(os.path.dirname(f"cdn_assets/profiles/{file_name}"), exist_ok=True)
+
+    if file:
+        try:
+            with open(f"cdn_assets/profiles/{file_name}", "wb") as f:
+                f.write(file.file.read())
+        except Exception as e:
+            raise handle_exception(e)
+    elif img_url:
+        try:
+            response = requests.get(img_url)
+        except Exception as e:
+            raise handle_exception(e)
+        if response.status_code != 200:
+            raise not_found_error("image")
+
+        try:
+            with open(f"cdn_assets/profiles/{file_name}", "wb") as f:
+                f.write(response.content)
+        except Exception as e:
+            raise handle_exception(e)
+    else:
+        raise not_found_error("file")
+
+    return {"message": "User Picture Added Successfully!"}
+
+
+@router.delete(
+    "/delete-picture",
+    dependencies=[Depends(authenticate_common)],
+    status_code=status.HTTP_200_OK,
+)
+async def delete_picture(request: Request):
+
+    """
+    Deletes the profile picture of the user.
+    """
+    user = request.state.user
+    file_name = f"{user.id}.png"
+
+    try:
+        os.remove(f"cdn_assets/profiles/{file_name}")
+    except Exception as e:
+        raise handle_exception(e)
+
+    return {"message": "User Picture Deleted Successfully!"}
