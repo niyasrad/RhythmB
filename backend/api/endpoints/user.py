@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 
-from core.models.user import User
+from core.models.user import User, UserRole
 from core.schemas.user import User as UserSchema, UserOpt as UserOptSchema
 from core.utils.dependencies import get_db
 from core.utils.errors import (
@@ -16,7 +16,7 @@ from core.utils.auth import (
     create_access_token,
     check_existing_user,
 )
-from core.utils.middlewares import authenticate_user
+from core.utils.middlewares import authenticate_common
 
 router = APIRouter(
     prefix="/user",
@@ -39,17 +39,20 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
     hashed_password = pwd_context.hash(user.password)
 
     try:
-        user = User(
-            username=user.username, email=user.email, hashed_password=hashed_password
+        new_user = User(
+            username=user.username,
+            email=user.email,
+            hashed_password=hashed_password,
+            role=user.role,
         )
-        db.add(user)
+        db.add(new_user)
         db.commit()
-        db.refresh(user)
+        db.refresh(new_user)
 
-        access_token = create_access_token(data={"username": user.username})
+        access_token = create_access_token(data={"username": new_user.username})
         return {
             "message": "User Created Successfully!",
-            "data": {"token": access_token, "username": user.username},
+            "data": {"token": access_token, "username": new_user.username},
         }
     except Exception as e:
         raise handle_exception(e)
@@ -80,7 +83,7 @@ async def sign_in(user: UserOptSchema, db: Session = Depends(get_db)):
 
 @router.get(
     "/profile",
-    dependencies=[Depends(authenticate_user)],
+    dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
 async def get_profile(request: Request, db: Session = Depends(get_db)):
@@ -88,13 +91,45 @@ async def get_profile(request: Request, db: Session = Depends(get_db)):
     """
     Returns the profile of the user.
     """
+    user = request.state.user
 
-    username = request.state.username
-    try:
-        user = db.query(User).filter(User.username == username).first()
-        return {
-            "message": "User Profile Fetched Successfully!",
-            "data": {"username": user.username, "email": user.email},
-        }
-    except Exception as e:
-        return handle_exception(e)
+    return {
+        "message": "User Profile Fetched Successfully!",
+        "data": {"id": user.id, "username": user.username, "email": user.email},
+    }
+
+
+@router.get(
+    "/get-playlists",
+    dependencies=[Depends(authenticate_common)],
+    status_code=status.HTTP_200_OK,
+)
+async def get_playlists(request: Request, db: Session = Depends(get_db)):
+
+    """
+    Returns the playlists of the user.
+    """
+    user = request.state.user
+
+    return {
+        "message": "User Playlists Fetched Successfully!",
+        "data": user.playlists,
+    }
+
+
+@router.get(
+    "/get-ratings",
+    dependencies=[Depends(authenticate_common)],
+    status_code=status.HTTP_200_OK,
+)
+async def get_ratings(request: Request, db: Session = Depends(get_db)):
+
+    """
+    Returns the ratings of the user.
+    """
+    user = request.state.user
+
+    return {
+        "message": "User Ratings Fetched Successfully!",
+        "data": user.ratings,
+    }
