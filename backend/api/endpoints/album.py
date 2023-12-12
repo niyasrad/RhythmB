@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, status, Request
+import requests
+import os
+
+from fastapi import APIRouter, Depends, status, Request, UploadFile, File, Form
 
 from sqlalchemy.orm import Session
 
@@ -6,7 +9,7 @@ from core.models.album import Album
 from core.schemas.album import Album as AlbumSchema
 
 from core.utils.dependencies import get_db
-from core.utils.errors import handle_exception, not_found_error
+from core.utils.errors import handle_exception, not_found_error, unauthorized_error
 from core.utils.middlewares import authenticate_common, authenticate_artist
 
 router = APIRouter(
@@ -114,3 +117,90 @@ async def delete_album(album_id: int, db: Session = Depends(get_db)):
         return {"message": "Album Deleted Successfully!", "data": find_album}
     except Exception as e:
         raise handle_exception(e)
+
+
+@router.post(
+    "/add-album-cover",
+    dependencies=[Depends(authenticate_artist)],
+    status_code=status.HTTP_200_OK,
+)
+async def add_album_cover(
+    request: Request,
+    album_id: int = Form(...),
+    file: UploadFile = File(None),
+    img_url: str = Form(None),
+    db: Session = Depends(get_db),
+):
+
+    """
+    Adds the album cover to the album with the given id.
+    """
+    user = request.state.user
+
+    find_album = db.query(Album).filter(Album.id == album_id).first()
+
+    if not find_album:
+        raise not_found_error("album")
+
+    if find_album.artist_id != user.id:
+        raise unauthorized_error()
+
+    file_name = f"{album_id}.png"
+
+    os.makedirs(os.path.dirname(f"cdn_assets/albums/{file_name}"), exist_ok=True)
+
+    if file:
+        try:
+            with open(f"cdn_assets/albums/{file_name}", "wb") as f:
+                f.write(file.file.read())
+        except Exception as e:
+            raise handle_exception(e)
+    elif img_url:
+        try:
+            response = requests.get(img_url)
+        except Exception as e:
+            raise handle_exception(e)
+        if response.status_code != 200:
+            raise not_found_error("image")
+
+        try:
+            with open(f"cdn_assets/albums/{file_name}", "wb") as f:
+                f.write(response.content)
+        except Exception as e:
+            raise handle_exception(e)
+    else:
+        raise not_found_error("file")
+
+    return {"message": "Album Cover Added Successfully!"}
+
+
+@router.delete(
+    "/delete-album-cover/{album_id}",
+    dependencies=[Depends(authenticate_artist)],
+    status_code=status.HTTP_200_OK,
+)
+async def delete_album_cover(
+    request: Request, album_id: int, db: Session = Depends(get_db)
+):
+
+    """
+    Deletes the album cover of the album with the given id.
+    """
+    user = request.state.user
+
+    find_album = db.query(Album).filter(Album.id == album_id).first()
+
+    if not find_album:
+        raise not_found_error("album")
+
+    if find_album.artist_id != user.id:
+        raise unauthorized_error()
+
+    file_name = f"{album_id}.png"
+
+    try:
+        os.remove(f"cdn_assets/albums/{file_name}")
+    except Exception as e:
+        raise handle_exception(e)
+
+    return {"message": "Album Cover Deleted Successfully!"}

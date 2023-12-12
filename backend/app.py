@@ -1,4 +1,8 @@
+import os
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
 from api.endpoints import user, artist, song, playlist, album, rating
 from core.utils.database import Base, engine
 from core.utils.middlewares import init_middlewares
@@ -13,6 +17,9 @@ app = FastAPI(
     redoc_url="/redocs",
     contact={"name": "Niyas Hameed", "url": "https://niyas-hameed.vercel.app/"},
 )
+
+os.makedirs(os.path.dirname(f"cdn_assets/"), exist_ok=True)
+app.mount("/cdn_asset/", StaticFiles(directory="cdn_assets"), name="static")
 
 init_middlewares(app)
 
