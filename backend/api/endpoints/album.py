@@ -52,7 +52,15 @@ async def get_album(album_id: int, db: Session = Depends(get_db)):
     if not find_album:
         raise not_found_error("album")
 
-    return {"message": "Album Found!", "data": find_album}
+    return {
+        "message": "Album Found!",
+        "data": {
+            "album_id": find_album.id,
+            "title": find_album.title,
+            "songs": find_album.songs,
+            "artist": find_album.artist,
+        },
+    }
 
 
 @router.put(

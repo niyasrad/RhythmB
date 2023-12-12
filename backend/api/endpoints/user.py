@@ -95,25 +95,12 @@ async def get_profile(request: Request, db: Session = Depends(get_db)):
 
     return {
         "message": "User Profile Fetched Successfully!",
-        "data": {"id": user.id, "username": user.username, "email": user.email},
-    }
-
-
-@router.get(
-    "/get-playlists",
-    dependencies=[Depends(authenticate_common)],
-    status_code=status.HTTP_200_OK,
-)
-async def get_playlists(request: Request, db: Session = Depends(get_db)):
-
-    """
-    Returns the playlists of the user.
-    """
-    user = request.state.user
-
-    return {
-        "message": "User Playlists Fetched Successfully!",
-        "data": user.playlists,
+        "data": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "playlists": user.playlists,
+        },
     }
 
 
@@ -128,8 +115,14 @@ async def get_ratings(request: Request, db: Session = Depends(get_db)):
     Returns the ratings of the user.
     """
     user = request.state.user
+    ratings = user.ratings
 
     return {
         "message": "User Ratings Fetched Successfully!",
-        "data": user.ratings,
+        "data": {
+            "ratings": [
+                {"id": rating.id, "song": rating.song, "rating": rating.rating}
+                for rating in ratings
+            ]
+        },
     }

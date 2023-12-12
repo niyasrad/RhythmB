@@ -39,8 +39,6 @@ async def authenticate_user(
             raise unauthorized_error()
         user = db.query(User).filter(User.username == username).first()
 
-        print(user.role)
-
         if role == "common" and user.role in [
             UserRole.ARTIST,
             UserRole.ADMIN,
