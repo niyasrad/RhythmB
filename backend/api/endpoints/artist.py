@@ -61,7 +61,16 @@ async def get_artist(artist_id: int, db: Session = Depends(get_db)):
     if not find_artist:
         raise not_found_error("artist")
 
-    return {"message": "Artist Found!", "data": find_artist}
+    return {
+        "message": "Artist Found!",
+        "data": {
+            "artist_id": find_artist.id,
+            "name": find_artist.name,
+            "genre": find_artist.genre,
+            "albums": find_artist.albums,
+            "songs": find_artist.songs[0:5],
+        },
+    }
 
 
 @router.put(
