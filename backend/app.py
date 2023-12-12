@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.endpoints import user
+from api.endpoints import user, artist, song, playlist, album, rating
 from core.utils.database import Base, engine
 from core.utils.middlewares import init_middlewares
 
@@ -17,6 +17,11 @@ app = FastAPI(
 init_middlewares(app)
 
 app.include_router(user.router)
+app.include_router(artist.router)
+app.include_router(album.router)
+app.include_router(song.router)
+app.include_router(playlist.router)
+app.include_router(rating.router)
 
 
 @app.get("/", status_code=200, tags=["Base"])
