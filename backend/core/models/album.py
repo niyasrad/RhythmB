@@ -11,10 +11,12 @@ class Album(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     title = Column(String, index=True)
-    artist_id = Column(UUID(as_uuid=True), ForeignKey("artists.id"), index=True)
+    artist_id = Column(
+        UUID(as_uuid=True), ForeignKey("artists.id", ondelete="CASCADE"), index=True
+    )
 
     artist = relationship("Artist", back_populates="albums")
-    songs = relationship("Song", back_populates="album")
+    songs = relationship("Song", back_populates="album", cascade="all, delete")
 
     def __repr__(self):
         return f"<Album {self.title} {self.artist}>"

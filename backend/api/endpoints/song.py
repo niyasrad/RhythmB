@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
 
+from core.models.user import UserRole
 from core.models.song import Song
 from core.schemas.song import Song as SongSchema
 
 from core.utils.dependencies import get_db
-from core.utils.errors import handle_exception, not_found_error
+from core.utils.errors import handle_exception, not_found_error, unauthorized_error
 from core.utils.middlewares import authenticate_common, authenticate_artist
 
 router = APIRouter(
@@ -95,8 +96,8 @@ async def update_song(
     if not find_song:
         raise not_found_error("Song")
 
-    if find_song.artist_id != artist.id:
-        raise not_found_error("Song")
+    if find_song.artist_id != artist.id and artist.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     try:
         find_song.title = song.title
@@ -130,13 +131,13 @@ async def delete_song(request: Request, song_id: str, db: Session = Depends(get_
     if not find_song:
         raise not_found_error("Song")
 
-    if find_song.artist_id != artist.id:
-        raise not_found_error("Song")
+    if find_song.artist_id != artist.id and artist.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     try:
         db.delete(find_song)
         db.commit()
 
-        return {"message": "Song Deleted Successfully!", "data": find_song}
+        return {"message": "Song Deleted Successfully!"}
     except Exception as e:
         raise handle_exception(e)

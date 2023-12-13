@@ -27,3 +27,4 @@ archive.zip
 .DS_Store
 package-lock.json
 node_modules
+populate_data.py

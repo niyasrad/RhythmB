@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, status, Request, UploadFile, File, Form
 
 from sqlalchemy.orm import Session
 
+from core.models.user import UserRole
+from core.models.artist import Artist
 from core.models.album import Album
 from core.schemas.album import Album as AlbumSchema
 
@@ -23,10 +25,19 @@ router = APIRouter(
     dependencies=[Depends(authenticate_artist)],
     status_code=status.HTTP_200_OK,
 )
-async def create_album(album: AlbumSchema, db: Session = Depends(get_db)):
+async def create_album(
+    request: Request, album: AlbumSchema, db: Session = Depends(get_db)
+):
     """
     Creates a new album.
     """
+
+    artist = request.state.user
+
+    find_artist = db.query(Artist).filter(Artist.user_id == artist.id)
+
+    if not find_artist and artist.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     new_album = Album(title=album.title, artist_id=album.artist_id)
 
@@ -72,16 +83,21 @@ async def get_album(album_id: str, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
 )
 async def update_album(
-    album_id: str, album: AlbumSchema, db: Session = Depends(get_db)
+    request: Request, album_id: str, album: AlbumSchema, db: Session = Depends(get_db)
 ):
     """
     Updates the album with the given id.
     """
 
+    user = request.state.user
+
     find_album = db.query(Album).filter(Album.id == album_id).first()
 
     if not find_album:
         raise not_found_error("album")
+
+    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     try:
         find_album.title = album.title
@@ -100,21 +116,26 @@ async def update_album(
     dependencies=[Depends(authenticate_artist)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_album(album_id: str, db: Session = Depends(get_db)):
+async def delete_album(request: Request, album_id: str, db: Session = Depends(get_db)):
     """
     Deletes the album with the given id.
     """
+
+    user = request.state.user
 
     find_album = db.query(Album).filter(Album.id == album_id).first()
 
     if not find_album:
         raise not_found_error("album")
 
+    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
+        raise unauthorized_error()
+
     try:
         db.delete(find_album)
         db.commit()
 
-        return {"message": "Album Deleted Successfully!", "data": find_album}
+        return {"message": "Album Deleted Successfully!"}
     except Exception as e:
         raise handle_exception(e)
 
@@ -142,7 +163,7 @@ async def add_album_cover(
     if not find_album:
         raise not_found_error("album")
 
-    if find_album.artist_id != user.id:
+    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
     file_name = f"{album_id}.png"
@@ -193,7 +214,7 @@ async def delete_album_cover(
     if not find_album:
         raise not_found_error("album")
 
-    if find_album.artist_id != user.id:
+    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
     file_name = f"{album_id}.png"

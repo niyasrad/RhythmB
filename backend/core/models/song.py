@@ -13,8 +13,12 @@ class Song(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     title = Column(String, index=True)
-    artist_id = Column(UUID(as_uuid=True), ForeignKey("artists.id"), index=True)
-    album_id = Column(UUID(as_uuid=True), ForeignKey("albums.id"), index=True)
+    artist_id = Column(
+        UUID(as_uuid=True), ForeignKey("artists.id", ondelete="CASCADE"), index=True
+    )
+    album_id = Column(
+        UUID(as_uuid=True), ForeignKey("albums.id", ondelete="CASCADE"), index=True
+    )
     genre = Column(String, index=True)
     length = Column(Integer, index=True)
 
@@ -23,7 +27,7 @@ class Song(Base):
         "Playlist", secondary=songs_playlists_association, back_populates="songs"
     )
     album = relationship("Album", back_populates="songs")
-    ratings = relationship("Rating", back_populates="song")
+    ratings = relationship("Rating", back_populates="song", cascade="all, delete")
 
     def __repr__(self):
         return (

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
 
+from core.models.user import UserRole
 from core.models.playlist import Playlist
 from core.models.song import Song
 
@@ -92,7 +93,7 @@ async def update_playlist(
     if not find_playlist:
         raise not_found_error("playlist")
 
-    if find_playlist.user_id != user.id:
+    if find_playlist.user_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
     try:
@@ -125,7 +126,7 @@ async def delete_playlist(
     if not find_playlist:
         raise not_found_error("playlist")
 
-    if find_playlist.user_id != user.id:
+    if find_playlist.user_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
     try:
@@ -160,7 +161,7 @@ async def add_song_to_playlist(
     if not find_playlist:
         raise not_found_error("playlist")
 
-    if find_playlist.user_id != user.id:
+    if find_playlist.user_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
     find_song = db.query(Song).filter(Song.id == association.song_id).first()
@@ -220,7 +221,7 @@ async def remove_song_from_playlist(
     if not find_playlist:
         raise not_found_error("playlist")
 
-    if find_playlist.user_id != user.id:
+    if find_playlist.user_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
     find_song = db.query(Song).filter(Song.id == association.song_id).first()
