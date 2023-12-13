@@ -58,7 +58,7 @@ async def create_rating(
 )
 async def update_rating(
     request: Request,
-    rating_id: int,
+    rating_id: str,
     rating: RatingSchema,
     db: Session = Depends(get_db),
 ):
@@ -93,7 +93,7 @@ async def update_rating(
     status_code=status.HTTP_200_OK,
 )
 async def delete_rating(
-    request: Request, rating_id: int, db: Session = Depends(get_db)
+    request: Request, rating_id: str, db: Session = Depends(get_db)
 ):
     """
     Deletes the rating with the given id.
