@@ -6,7 +6,12 @@ from core.models.artist import Artist
 from core.schemas.artist import Artist as ArtistSchema
 
 from core.utils.dependencies import get_db
-from core.utils.errors import handle_exception, not_found_error, conflict_error
+from core.utils.errors import (
+    handle_exception,
+    not_found_error,
+    conflict_error,
+    unauthorized_error,
+)
 from core.utils.middlewares import authenticate_common, authenticate_artist
 
 router = APIRouter(
@@ -51,7 +56,7 @@ async def create_artist(
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
-async def get_artist(artist_id: int, db: Session = Depends(get_db)):
+async def get_artist(artist_id: str, db: Session = Depends(get_db)):
     """
     Returns the artist with the given id.
     """
@@ -80,7 +85,7 @@ async def get_artist(artist_id: int, db: Session = Depends(get_db)):
 )
 async def update_artist(
     request: Request,
-    artist_id: int,
+    artist_id: str,
     artist: ArtistSchema,
     db: Session = Depends(get_db),
 ):
@@ -89,6 +94,9 @@ async def update_artist(
     """
 
     user = request.state.user
+
+    if artist_id != user.id:
+        raise unauthorized_error()
 
     find_artist = db.query(Artist).filter(Artist.user_id == user.id).first()
 
@@ -113,13 +121,16 @@ async def update_artist(
     status_code=status.HTTP_200_OK,
 )
 async def delete_artist(
-    request: Request, artist_id: int, db: Session = Depends(get_db)
+    request: Request, artist_id: str, db: Session = Depends(get_db)
 ):
     """
     Deletes the artist with the given id.
     """
 
     user = request.state.user
+
+    if artist_id != user.id:
+        raise unauthorized_error()
 
     find_artist = db.query(Artist).filter(Artist.user_id == user.id).first()
 

@@ -48,7 +48,7 @@ async def create_song(song: SongSchema, db: Session = Depends(get_db)):
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
-async def get_song(song_id: int, db: Session = Depends(get_db)):
+async def get_song(song_id: str, db: Session = Depends(get_db)):
     """
     Returns the song with the given id.
     """
@@ -67,7 +67,7 @@ async def get_song(song_id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
 )
 async def update_song(
-    request: Request, song_id: int, song: SongSchema, db: Session = Depends(get_db)
+    request: Request, song_id: str, song: SongSchema, db: Session = Depends(get_db)
 ):
     """
     Updates the song with the given id.
@@ -103,7 +103,7 @@ async def update_song(
     dependencies=[Depends(authenticate_artist)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_song(request: Request, song_id: int, db: Session = Depends(get_db)):
+async def delete_song(request: Request, song_id: str, db: Session = Depends(get_db)):
     """
     Deletes the song with the given id.
     """

@@ -45,7 +45,7 @@ async def create_album(album: AlbumSchema, db: Session = Depends(get_db)):
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
-async def get_album(album_id: int, db: Session = Depends(get_db)):
+async def get_album(album_id: str, db: Session = Depends(get_db)):
     """
     Returns the album with the given id.
     """
@@ -72,7 +72,7 @@ async def get_album(album_id: int, db: Session = Depends(get_db)):
     status_code=status.HTTP_200_OK,
 )
 async def update_album(
-    album_id: int, album: AlbumSchema, db: Session = Depends(get_db)
+    album_id: str, album: AlbumSchema, db: Session = Depends(get_db)
 ):
     """
     Updates the album with the given id.
@@ -100,7 +100,7 @@ async def update_album(
     dependencies=[Depends(authenticate_artist)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_album(album_id: int, db: Session = Depends(get_db)):
+async def delete_album(album_id: str, db: Session = Depends(get_db)):
     """
     Deletes the album with the given id.
     """
@@ -126,7 +126,7 @@ async def delete_album(album_id: int, db: Session = Depends(get_db)):
 )
 async def add_album_cover(
     request: Request,
-    album_id: int = Form(...),
+    album_id: str = Form(...),
     file: UploadFile = File(None),
     img_url: str = Form(None),
     db: Session = Depends(get_db),
@@ -180,7 +180,7 @@ async def add_album_cover(
     status_code=status.HTTP_200_OK,
 )
 async def delete_album_cover(
-    request: Request, album_id: int, db: Session = Depends(get_db)
+    request: Request, album_id: str, db: Session = Depends(get_db)
 ):
 
     """

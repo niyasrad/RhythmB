@@ -49,7 +49,7 @@ async def create_playlist(
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
-async def get_playlist(playlist_id: int, db: Session = Depends(get_db)):
+async def get_playlist(playlist_id: str, db: Session = Depends(get_db)):
     """
     Returns the playlist with the given id.
     """
@@ -77,7 +77,7 @@ async def get_playlist(playlist_id: int, db: Session = Depends(get_db)):
 )
 async def update_playlist(
     request: Request,
-    playlist_id: int,
+    playlist_id: str,
     playlist: PlaylistSchema,
     db: Session = Depends(get_db),
 ):
@@ -112,7 +112,7 @@ async def update_playlist(
     status_code=status.HTTP_200_OK,
 )
 async def delete_playlist(
-    request: Request, playlist_id: int, db: Session = Depends(get_db)
+    request: Request, playlist_id: str, db: Session = Depends(get_db)
 ):
     """
     Deletes the playlist with the given id.
