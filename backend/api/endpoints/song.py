@@ -58,7 +58,22 @@ async def get_song(song_id: str, db: Session = Depends(get_db)):
     if not find_song:
         raise not_found_error("Song")
 
-    return {"message": "Song Found!", "data": find_song}
+    total_ratings = sum(rating.rating for rating in find_song.ratings)
+    num_ratings = len(find_song.ratings) if find_song.ratings else 0
+    average_rating = (total_ratings / num_ratings) if num_ratings != 0 else 0
+
+    return {
+        "message": "Song Found!",
+        "data": {
+            "id": find_song.id,
+            "title": find_song.title,
+            "artist": find_song.artist,
+            "album": find_song.album,
+            "genre": find_song.genre,
+            "length": find_song.length,
+            "ratings": {"total": num_ratings, "avg": average_rating},
+        },
+    }
 
 
 @router.put(
