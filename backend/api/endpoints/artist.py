@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
 
+from core.models.user import UserRole
 from core.models.artist import Artist
 from core.schemas.artist import Artist as ArtistSchema
 
@@ -38,6 +39,9 @@ async def create_artist(
 
     if find_artist:
         raise conflict_error("artist")
+
+    if user.id != artist.user_id or user.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     new_artist = Artist(name=artist.name, genre=artist.genre, user_id=user.id)
 
@@ -95,13 +99,13 @@ async def update_artist(
 
     user = request.state.user
 
-    if artist_id != user.id:
-        raise unauthorized_error()
-
-    find_artist = db.query(Artist).filter(Artist.user_id == user.id).first()
+    find_artist = db.query(Artist).filter(Artist.id == artist_id).first()
 
     if not find_artist:
         raise not_found_error("artist")
+
+    if find_artist.user_id != user.id and user.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     try:
         find_artist.name = artist.name
@@ -129,13 +133,13 @@ async def delete_artist(
 
     user = request.state.user
 
-    if artist_id != user.id:
-        raise unauthorized_error()
-
-    find_artist = db.query(Artist).filter(Artist.user_id == user.id).first()
+    find_artist = db.query(Artist).filter(Artist.id == artist_id).first()
 
     if not find_artist:
         raise not_found_error("artist")
+
+    if find_artist.user_id != user.id and user.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     try:
         db.delete(find_artist)

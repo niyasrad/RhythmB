@@ -22,8 +22,8 @@ class User(Base):
     hashed_password = Column(String)
     role = Column(Enum(UserRole), default=UserRole.COMMON)
 
-    playlists = relationship("Playlist", back_populates="user")
-    ratings = relationship("Rating", back_populates="user")
+    playlists = relationship("Playlist", back_populates="user", cascade="all, delete")
+    ratings = relationship("Rating", back_populates="user", cascade="all, delete")
 
     def __repr__(self):
         return f"<User {self.username} {self.email}>"

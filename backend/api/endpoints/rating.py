@@ -2,11 +2,17 @@ from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
 
+from core.models.user import UserRole
 from core.models.rating import Rating
 from core.schemas.rating import Rating as RatingSchema
 
 from core.utils.dependencies import get_db
-from core.utils.errors import handle_exception, not_found_error, conflict_error
+from core.utils.errors import (
+    handle_exception,
+    not_found_error,
+    conflict_error,
+    unauthorized_error,
+)
 from core.utils.middlewares import authenticate_common
 
 router = APIRouter(
@@ -31,13 +37,16 @@ async def create_rating(
 
     find_rating = (
         db.query(Rating)
-        .filter(Rating.user_id == user.id)
+        .filter(Rating.user_id == rating.user_id)
         .filter(Rating.song_id == rating.song_id)
         .first()
     )
 
     if find_rating:
         raise conflict_error("rating")
+
+    if user.id != rating.user_id and user.role != UserRole.ADMIN:
+        raise unauthorized_error()
 
     new_rating = Rating(rating=rating.rating, user_id=user.id, song_id=rating.song_id)
 
@@ -73,7 +82,7 @@ async def update_rating(
     if not find_rating:
         raise not_found_error("Rating")
 
-    if find_rating.user_id != user.id:
+    if find_rating.user_id != user.id and user.role != UserRole.ADMIN:
         raise not_found_error("Rating")
 
     find_rating.rating = rating.rating
@@ -106,7 +115,7 @@ async def delete_rating(
     if not find_rating:
         raise not_found_error("Rating")
 
-    if find_rating.user_id != user.id:
+    if find_rating.user_id != user.id and user.role != UserRole.ADMIN:
         raise not_found_error("Rating")
 
     try:
