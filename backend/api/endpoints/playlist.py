@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
+from core.utils.search import es
 
 from core.models.user import UserRole
 from core.models.playlist import Playlist
@@ -39,6 +40,14 @@ async def create_playlist(
         db.add(new_playlist)
         db.commit()
         db.refresh(new_playlist)
+
+        playlist_document = {
+            "id": new_playlist.id,
+            "title": new_playlist.title,
+            "user_id": new_playlist.user_id,
+        }
+
+        es.index(index="playlists", id=new_playlist.id, body=playlist_document)
 
         return {"message": "Playlist Created Successfully!", "data": new_playlist}
     except Exception as e:
@@ -101,6 +110,14 @@ async def update_playlist(
 
         db.commit()
         db.refresh(find_playlist)
+
+        playlist_document = {
+            "title": find_playlist.title,
+        }
+
+        es.index(
+            index="playlists", id=find_playlist.id, body={"doc": playlist_document}
+        )
 
         return {"message": "Playlist Updated Successfully!", "data": find_playlist}
     except Exception as e:

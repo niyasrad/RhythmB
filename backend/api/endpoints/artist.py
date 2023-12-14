@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
+from core.utils.search import es
 
 from core.models.user import UserRole
 from core.models.artist import Artist
@@ -40,7 +41,7 @@ async def create_artist(
     if find_artist:
         raise conflict_error("artist")
 
-    if user.id != artist.user_id or user.role != UserRole.ADMIN:
+    if user.id != artist.user_id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
     new_artist = Artist(name=artist.name, genre=artist.genre, user_id=user.id)
@@ -49,6 +50,15 @@ async def create_artist(
         db.add(new_artist)
         db.commit()
         db.refresh(new_artist)
+
+        artist_document = {
+            "id": new_artist.id,
+            "name": new_artist.name,
+            "genre": new_artist.genre,
+            "user_id": new_artist.user_id,
+        }
+
+        es.index(index="artists", id=new_artist.id, body=artist_document)
 
         return {"message": "Artist Created Successfully!", "data": new_artist}
     except Exception as e:
@@ -114,6 +124,13 @@ async def update_artist(
         db.commit()
         db.refresh(find_artist)
 
+        artist_document = {
+            "name": find_artist.name,
+            "genre": find_artist.genre,
+        }
+
+        es.update(index="artists", id=find_artist.id, body={"doc": artist_document})
+
         return {"message": "Artist Updated Successfully!", "data": find_artist}
     except Exception as e:
         raise handle_exception(e)
@@ -141,9 +158,16 @@ async def delete_artist(
     if find_artist.user_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
+    del_query = {"query": {"term": {"artist_id": find_artist.id}}}
+
     try:
         db.delete(find_artist)
         db.commit()
+
+        es.delete_by_query(index="ratings", body=del_query)
+        es.delete_by_query(index="songs", body=del_query)
+        es.delete_by_query(index="albums", body=del_query)
+        es.delete(index="artists", id=find_artist.id)
 
         return {"message": "Artist Deleted Successfully!"}
     except Exception as e:
