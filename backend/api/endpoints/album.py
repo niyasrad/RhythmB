@@ -4,6 +4,7 @@ import os
 from fastapi import APIRouter, Depends, status, Request, UploadFile, File, Form
 
 from sqlalchemy.orm import Session
+from core.utils.search import es
 
 from core.models.user import UserRole
 from core.models.artist import Artist
@@ -45,6 +46,14 @@ async def create_album(
         db.add(new_album)
         db.commit()
         db.refresh(new_album)
+
+        album_document = {
+            "id": new_album.id,
+            "title": new_album.title,
+            "artist_id": new_album.artist_id,
+        }
+
+        es.index(index="albums", id=new_album.id, body=album_document)
 
         return {"message": "Album Created Successfully!", "data": new_album}
     except Exception as e:
@@ -106,6 +115,13 @@ async def update_album(
         db.commit()
         db.refresh(find_album)
 
+        album_document = {
+            "title": find_album.title,
+            "artist_id": find_album.artist_id,
+        }
+
+        es.update(index="albums", id=find_album.id, body={"doc": album_document})
+
         return {"message": "Album Updated Successfully!", "data": find_album}
     except Exception as e:
         raise handle_exception(e)
@@ -131,9 +147,15 @@ async def delete_album(request: Request, album_id: str, db: Session = Depends(ge
     if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
         raise unauthorized_error()
 
+    del_query = {"query": {"term": {"album_id": find_album.id}}}
+
     try:
         db.delete(find_album)
         db.commit()
+
+        es.delete_by_query(index="ratings", body=del_query)
+        es.delete_by_query(index="songs", body=del_query)
+        es.delete(index="albums", id=find_album.id)
 
         return {"message": "Album Deleted Successfully!"}
     except Exception as e:

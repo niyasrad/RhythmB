@@ -3,8 +3,9 @@ import os
 
 from fastapi import APIRouter, Depends, status, Request, UploadFile, File, Form
 from sqlalchemy.orm import Session
+from core.utils.search import es
 
-from core.models.user import User, UserRole
+from core.models.user import User
 from core.schemas.user import User as UserSchema, UserOpt as UserOptSchema
 from core.utils.dependencies import get_db
 from core.utils.errors import (
@@ -51,6 +52,16 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
+
+        user_document = {
+            "id": new_user.id,
+            "username": new_user.username,
+            "email": new_user.email,
+            "role": new_user.role,
+            "hashed_password": new_user.hashed_password,
+        }
+
+        es.index(index="users", id=new_user.id, body=user_document)
 
         access_token = create_access_token(data={"username": new_user.username})
         return {

@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
+from core.utils.search import es
 
 from core.models.user import UserRole
+from core.models.song import Song
 from core.models.rating import Rating
 from core.schemas.rating import Rating as RatingSchema
 
@@ -49,11 +51,26 @@ async def create_rating(
         raise unauthorized_error()
 
     new_rating = Rating(rating=rating.rating, user_id=user.id, song_id=rating.song_id)
+    rated_song = db.query(Song).filter(Song.id == new_rating.song_id).first()
+
+    if not rated_song:
+        raise not_found_error("Song")
 
     try:
         db.add(new_rating)
         db.commit()
         db.refresh(new_rating)
+
+        rating_document = {
+            "id": new_rating.id,
+            "rating": new_rating.rating,
+            "user_id": new_rating.user_id,
+            "song_id": new_rating.song_id,
+            "artist_id": rated_song.artist_id,
+            "album_id": rated_song.album_id,
+        }
+
+        es.index(index="ratings", id=new_rating.id, body=rating_document)
 
         return {"message": "Rating Created Successfully!", "data": new_rating}
     except Exception as e:
@@ -86,10 +103,18 @@ async def update_rating(
         raise not_found_error("Rating")
 
     find_rating.rating = rating.rating
+    find_rating.song_id = rating.song_id
 
     try:
         db.commit()
         db.refresh(find_rating)
+
+        rating_document = {
+            "rating": find_rating.rating,
+            "song_id": find_rating.song_id,
+        }
+
+        es.update(index="ratings", id=find_rating.id, body={"doc": rating_document})
 
         return {"message": "Rating Updated Successfully!", "data": find_rating}
     except Exception as e:
@@ -121,6 +146,8 @@ async def delete_rating(
     try:
         db.delete(find_rating)
         db.commit()
+
+        es.delete(index="ratings", id=find_rating.id)
 
         return {"message": "Rating Deleted Successfully!"}
     except Exception as e:

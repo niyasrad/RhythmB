@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status, Request
 
 from sqlalchemy.orm import Session
+from core.utils.search import es
 
 from core.models.user import UserRole
 from core.models.song import Song
@@ -38,6 +39,17 @@ async def create_song(song: SongSchema, db: Session = Depends(get_db)):
         db.add(new_song)
         db.commit()
         db.refresh(new_song)
+
+        song_document = {
+            "id": new_song.id,
+            "title": new_song.title,
+            "artist_id": new_song.artist_id,
+            "album_id": new_song.album_id,
+            "genre": new_song.genre,
+            "length": new_song.length,
+        }
+
+        es.index(index="songs", id=new_song.id, body=song_document)
 
         return {"message": "Song Created Successfully!", "data": new_song}
     except Exception as e:
@@ -109,6 +121,17 @@ async def update_song(
         db.commit()
         db.refresh(find_song)
 
+        song_document = {
+            "id": find_song.id,
+            "title": find_song.title,
+            "artist_id": find_song.artist_id,
+            "album_id": find_song.album_id,
+            "genre": find_song.genre,
+            "length": find_song.length,
+        }
+
+        es.update(index="songs", id=find_song.id, body={"doc": song_document})
+
         return {"message": "Song Updated Successfully!", "data": find_song}
     except Exception as e:
         raise handle_exception(e)
@@ -134,9 +157,14 @@ async def delete_song(request: Request, song_id: str, db: Session = Depends(get_
     if find_song.artist_id != artist.id and artist.role != UserRole.ADMIN:
         raise unauthorized_error()
 
+    del_query = {"query": {"term": {"song_id": find_song.id}}}
+
     try:
         db.delete(find_song)
         db.commit()
+
+        es.delete_by_query(index="ratings", body=del_query)
+        es.delete(index="songs", id=find_song.id)
 
         return {"message": "Song Deleted Successfully!"}
     except Exception as e:

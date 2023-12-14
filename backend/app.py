@@ -4,10 +4,12 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from api.endpoints import user, artist, song, playlist, album, rating
+from core.utils.search import initialize_indexes
 from core.utils.database import Base, engine
 from core.utils.middlewares import init_middlewares
 
 Base.metadata.create_all(bind=engine)
+initialize_indexes()
 
 app = FastAPI(
     title="RhythmB",
