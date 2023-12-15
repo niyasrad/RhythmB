@@ -69,6 +69,7 @@ def initialize_indexes():
                 "title": {"type": "text"},
                 "user_id": {"type": "keyword"},
                 "username": {"type": "text"},
+                "songs": {"type": "nested"}
             }
         }
     }

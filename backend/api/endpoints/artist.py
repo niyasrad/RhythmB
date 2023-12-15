@@ -130,12 +130,14 @@ async def delete_artist(artist_id: str, db: Session = Depends(get_db)):
         raise not_found_error("artist")
 
     del_query = {"query": {"term": {"artist_id": find_artist.id}}}
+    del_playlist_song_query = {"script": {"source": "ctx._source.songs.removeIf(song -> song.artist_id == params.artist_id)", "lang": "painless", "params": {"artist_id": find_artist.id}}}
 
     try:
         db.delete(find_artist)
         db.commit()
 
         es.delete_by_query(index="ratings", body=del_query)
+        es.update_by_query(index="playlists", body=del_playlist_song_query)
         es.delete_by_query(index="songs", body=del_query)
         es.delete_by_query(index="albums", body=del_query)
         es.delete(index="artists", id=find_artist.id)

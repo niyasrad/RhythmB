@@ -148,12 +148,14 @@ async def delete_song(song_id: str, db: Session = Depends(get_db)):
         raise not_found_error("Song")
 
     del_query = {"query": {"term": {"song_id": find_song.id}}}
+    del_playlist_song_query = {"script": {"source": "ctx._source.songs.removeIf(song -> song.id == params.song_id)", "lang": "painless", "params": {"song_id": find_song.id}}}
 
     try:
         db.delete(find_song)
         db.commit()
 
         es.delete_by_query(index="ratings", body=del_query)
+        es.update_by_query(index="playlists", body=del_playlist_song_query)
         es.delete(index="songs", id=find_song.id)
 
         return {"message": "Song Deleted Successfully!"}
