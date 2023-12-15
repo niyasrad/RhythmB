@@ -46,6 +46,7 @@ async def create_playlist(
             "title": new_playlist.title,
             "user_id": new_playlist.user_id,
             "username": new_playlist.user.username,
+            "songs": new_playlist.songs
         }
 
         es.index(index="playlists", id=new_playlist.id, body=playlist_document)
@@ -151,6 +152,8 @@ async def delete_playlist(
         db.delete(find_playlist)
         db.commit()
 
+        es.delete(index="playlists", id=find_playlist.id)
+
         return {"message": "Playlist Deleted Successfully!"}
     except Exception as e:
         raise handle_exception(e)
@@ -202,6 +205,28 @@ async def add_song_to_playlist(
         find_playlist.songs.append(find_song)
         db.commit()
         db.refresh(find_playlist)
+
+        song_document = {
+            "id": find_song.id,
+            "title": find_song.title,
+            "artist_id": find_song.artist_id,
+            "album_id": find_song.album_id,
+            "artist_name": find_song.artist.name,
+            "album_title": find_song.album.title,
+            "genre": find_song.genre,
+            "length": find_song.length,
+        }
+
+        es.update(
+            index="playlists",
+            id=find_playlist.id,
+            body={
+                "script": {
+                    "source": "ctx._source.songs.add(params.song)",
+                    "params": {"song": song_document},
+                }
+            },
+        )
 
         return {
             "message": "Song Added to Playlist Successfully!",
@@ -262,6 +287,17 @@ async def remove_song_from_playlist(
         find_playlist.songs.remove(find_song)
         db.commit()
         db.refresh(find_playlist)
+
+        es.update(
+            index="playlists",
+            id=find_playlist.id,
+            body={
+                "script": {
+                    "source": "ctx._source.songs.removeIf(song -> song.id == params.id)",
+                    "params": {"id": find_song.id}
+                },
+            },
+        )
 
         return {
             "message": "Song Removed from Playlist Successfully!",
