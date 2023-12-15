@@ -30,6 +30,7 @@ def initialize_indexes():
                 "id": {"type": "keyword"},
                 "title": {"type": "text"},
                 "artist_id": {"type": "keyword"},
+                "arist_name": {"type": "text"},
             }
         }
     }
@@ -41,6 +42,8 @@ def initialize_indexes():
                 "title": {"type": "text"},
                 "artist_id": {"type": "keyword"},
                 "album_id": {"type": "keyword"},
+                "artist_name": {"type": "text"},
+                "album_title": {"type": "text"},
                 "genre": {"type": "keyword"},
                 "length": {"type": "integer"},
             }
@@ -65,6 +68,7 @@ def initialize_indexes():
                 "id": {"type": "keyword"},
                 "title": {"type": "text"},
                 "user_id": {"type": "keyword"},
+                "username": {"type": "text"},
             }
         }
     }

@@ -57,7 +57,7 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
             "id": new_user.id,
             "username": new_user.username,
             "email": new_user.email,
-            "role": new_user.role,
+            "role": str(user.role),
             "hashed_password": new_user.hashed_password,
         }
 

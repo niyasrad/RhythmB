@@ -12,3 +12,4 @@ python-jose
 pre-commit
 python-multipart
 requests
+pandas

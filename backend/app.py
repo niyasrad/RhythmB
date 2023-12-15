@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from api.endpoints import user, artist, song, playlist, album, rating
+from api.endpoints import user, artist, song, playlist, album, rating, search, populate
 from core.utils.search import initialize_indexes
 from core.utils.database import Base, engine
 from core.utils.middlewares import init_middlewares
@@ -31,6 +31,8 @@ app.include_router(album.router)
 app.include_router(song.router)
 app.include_router(playlist.router)
 app.include_router(rating.router)
+app.include_router(search.router)
+app.include_router(populate.router)
 
 
 @app.get("/", status_code=200, tags=["Base"])
