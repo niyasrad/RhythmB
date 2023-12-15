@@ -9,7 +9,7 @@ from core.schemas.song import Song as SongSchema
 
 from core.utils.dependencies import get_db
 from core.utils.errors import handle_exception, not_found_error, unauthorized_error
-from core.utils.middlewares import authenticate_common, authenticate_artist
+from core.utils.middlewares import authenticate_common, authenticate_admin
 
 router = APIRouter(
     prefix="/song",
@@ -19,7 +19,7 @@ router = APIRouter(
 
 @router.post(
     "/create",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
 async def create_song(song: SongSchema, db: Session = Depends(get_db)):
@@ -45,6 +45,8 @@ async def create_song(song: SongSchema, db: Session = Depends(get_db)):
             "title": new_song.title,
             "artist_id": new_song.artist_id,
             "album_id": new_song.album_id,
+            "artist_name": new_song.artist.name,
+            "album_title": new_song.album.title,
             "genre": new_song.genre,
             "length": new_song.length,
         }
@@ -91,25 +93,18 @@ async def get_song(song_id: str, db: Session = Depends(get_db)):
 
 @router.put(
     "/{song_id}",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def update_song(
-    request: Request, song_id: str, song: SongSchema, db: Session = Depends(get_db)
-):
+async def update_song(song_id: str, song: SongSchema, db: Session = Depends(get_db)):
     """
     Updates the song with the given id.
     """
-
-    artist = request.state.user
 
     find_song = db.query(Song).filter(Song.id == song_id).first()
 
     if not find_song:
         raise not_found_error("Song")
-
-    if find_song.artist_id != artist.id and artist.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     try:
         find_song.title = song.title
@@ -139,23 +134,18 @@ async def update_song(
 
 @router.delete(
     "/{song_id}",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_song(request: Request, song_id: str, db: Session = Depends(get_db)):
+async def delete_song(song_id: str, db: Session = Depends(get_db)):
     """
     Deletes the song with the given id.
     """
-
-    artist = request.state.user
 
     find_song = db.query(Song).filter(Song.id == song_id).first()
 
     if not find_song:
         raise not_found_error("Song")
-
-    if find_song.artist_id != artist.id and artist.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     del_query = {"query": {"term": {"song_id": find_song.id}}}
 

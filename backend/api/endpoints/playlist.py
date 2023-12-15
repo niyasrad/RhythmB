@@ -45,6 +45,7 @@ async def create_playlist(
             "id": new_playlist.id,
             "title": new_playlist.title,
             "user_id": new_playlist.user_id,
+            "username": new_playlist.user.username,
         }
 
         es.index(index="playlists", id=new_playlist.id, body=playlist_document)

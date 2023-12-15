@@ -1,19 +1,18 @@
 import requests
 import os
 
-from fastapi import APIRouter, Depends, status, Request, UploadFile, File, Form
+from fastapi import APIRouter, Depends, status, UploadFile, File, Form
 
 from sqlalchemy.orm import Session
 from core.utils.search import es
 
-from core.models.user import UserRole
 from core.models.artist import Artist
 from core.models.album import Album
 from core.schemas.album import Album as AlbumSchema
 
 from core.utils.dependencies import get_db
-from core.utils.errors import handle_exception, not_found_error, unauthorized_error
-from core.utils.middlewares import authenticate_common, authenticate_artist
+from core.utils.errors import handle_exception, not_found_error
+from core.utils.middlewares import authenticate_common, authenticate_admin
 
 router = APIRouter(
     prefix="/album",
@@ -23,22 +22,18 @@ router = APIRouter(
 
 @router.post(
     "/create",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def create_album(
-    request: Request, album: AlbumSchema, db: Session = Depends(get_db)
-):
+async def create_album(album: AlbumSchema, db: Session = Depends(get_db)):
     """
     Creates a new album.
     """
 
-    artist = request.state.user
+    find_artist = db.query(Artist).filter(Artist.user_id == album.artist_id)
 
-    find_artist = db.query(Artist).filter(Artist.user_id == artist.id)
-
-    if not find_artist and artist.role != UserRole.ADMIN:
-        raise unauthorized_error()
+    if not find_artist:
+        raise not_found_error("artist")
 
     new_album = Album(title=album.title, artist_id=album.artist_id)
 
@@ -51,6 +46,7 @@ async def create_album(
             "id": new_album.id,
             "title": new_album.title,
             "artist_id": new_album.artist_id,
+            "artist_name": new_album.artist.name,
         }
 
         es.index(index="albums", id=new_album.id, body=album_document)
@@ -88,25 +84,20 @@ async def get_album(album_id: str, db: Session = Depends(get_db)):
 
 @router.put(
     "/{album_id}",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
 async def update_album(
-    request: Request, album_id: str, album: AlbumSchema, db: Session = Depends(get_db)
+    album_id: str, album: AlbumSchema, db: Session = Depends(get_db)
 ):
     """
     Updates the album with the given id.
     """
 
-    user = request.state.user
-
     find_album = db.query(Album).filter(Album.id == album_id).first()
 
     if not find_album:
         raise not_found_error("album")
-
-    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     try:
         find_album.title = album.title
@@ -129,23 +120,18 @@ async def update_album(
 
 @router.delete(
     "/{album_id}",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_album(request: Request, album_id: str, db: Session = Depends(get_db)):
+async def delete_album(album_id: str, db: Session = Depends(get_db)):
     """
     Deletes the album with the given id.
     """
-
-    user = request.state.user
 
     find_album = db.query(Album).filter(Album.id == album_id).first()
 
     if not find_album:
         raise not_found_error("album")
-
-    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     del_query = {"query": {"term": {"album_id": find_album.id}}}
 
@@ -164,11 +150,10 @@ async def delete_album(request: Request, album_id: str, db: Session = Depends(ge
 
 @router.post(
     "/add-album-cover",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
 async def add_album_cover(
-    request: Request,
     album_id: str = Form(...),
     file: UploadFile = File(None),
     img_url: str = Form(None),
@@ -178,15 +163,11 @@ async def add_album_cover(
     """
     Adds the album cover to the album with the given id.
     """
-    user = request.state.user
 
     find_album = db.query(Album).filter(Album.id == album_id).first()
 
     if not find_album:
         raise not_found_error("album")
-
-    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     file_name = f"{album_id}.png"
 
@@ -219,25 +200,19 @@ async def add_album_cover(
 
 @router.delete(
     "/delete-album-cover/{album_id}",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_album_cover(
-    request: Request, album_id: str, db: Session = Depends(get_db)
-):
+async def delete_album_cover(album_id: str, db: Session = Depends(get_db)):
 
     """
     Deletes the album cover of the album with the given id.
     """
-    user = request.state.user
 
     find_album = db.query(Album).filter(Album.id == album_id).first()
 
     if not find_album:
         raise not_found_error("album")
-
-    if find_album.artist_id != user.id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     file_name = f"{album_id}.png"
 

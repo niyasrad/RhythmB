@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, status, Request
+from fastapi import APIRouter, Depends, status
 
 from sqlalchemy.orm import Session
 from core.utils.search import es
 
-from core.models.user import UserRole
 from core.models.artist import Artist
 from core.schemas.artist import Artist as ArtistSchema
 
@@ -11,10 +10,8 @@ from core.utils.dependencies import get_db
 from core.utils.errors import (
     handle_exception,
     not_found_error,
-    conflict_error,
-    unauthorized_error,
 )
-from core.utils.middlewares import authenticate_common, authenticate_artist
+from core.utils.middlewares import authenticate_common, authenticate_admin
 
 router = APIRouter(
     prefix="/artist",
@@ -24,27 +21,15 @@ router = APIRouter(
 
 @router.post(
     "/create",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def create_artist(
-    request: Request, artist: ArtistSchema, db: Session = Depends(get_db)
-):
+async def create_artist(artist: ArtistSchema, db: Session = Depends(get_db)):
     """
     Creates a new artist.
     """
 
-    user = request.state.user
-
-    find_artist = db.query(Artist).filter(Artist.user_id == user.id).first()
-
-    if find_artist:
-        raise conflict_error("artist")
-
-    if user.id != artist.user_id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
-
-    new_artist = Artist(name=artist.name, genre=artist.genre, user_id=user.id)
+    new_artist = Artist(name=artist.name, genre=artist.genre)
 
     try:
         db.add(new_artist)
@@ -55,7 +40,6 @@ async def create_artist(
             "id": new_artist.id,
             "name": new_artist.name,
             "genre": new_artist.genre,
-            "user_id": new_artist.user_id,
         }
 
         es.index(index="artists", id=new_artist.id, body=artist_document)
@@ -94,11 +78,10 @@ async def get_artist(artist_id: str, db: Session = Depends(get_db)):
 
 @router.put(
     "/{artist_id}",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
 async def update_artist(
-    request: Request,
     artist_id: str,
     artist: ArtistSchema,
     db: Session = Depends(get_db),
@@ -107,15 +90,10 @@ async def update_artist(
     Updates the artist with the given id.
     """
 
-    user = request.state.user
-
     find_artist = db.query(Artist).filter(Artist.id == artist_id).first()
 
     if not find_artist:
         raise not_found_error("artist")
-
-    if find_artist.user_id != user.id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     try:
         find_artist.name = artist.name
@@ -138,25 +116,18 @@ async def update_artist(
 
 @router.delete(
     "/{artist_id}",
-    dependencies=[Depends(authenticate_artist)],
+    dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_artist(
-    request: Request, artist_id: str, db: Session = Depends(get_db)
-):
+async def delete_artist(artist_id: str, db: Session = Depends(get_db)):
     """
     Deletes the artist with the given id.
     """
-
-    user = request.state.user
 
     find_artist = db.query(Artist).filter(Artist.id == artist_id).first()
 
     if not find_artist:
         raise not_found_error("artist")
-
-    if find_artist.user_id != user.id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
 
     del_query = {"query": {"term": {"artist_id": find_artist.id}}}
 
