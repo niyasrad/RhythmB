@@ -3,12 +3,12 @@ from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 from core.utils.search import es
 
-from core.models.user import UserRole
+from core.models.rating import Rating
 from core.models.song import Song
 from core.schemas.song import Song as SongSchema
 
 from core.utils.dependencies import get_db
-from core.utils.errors import handle_exception, not_found_error, unauthorized_error
+from core.utils.errors import handle_exception, not_found_error
 from core.utils.middlewares import authenticate_common, authenticate_admin
 
 router = APIRouter(
@@ -63,15 +63,19 @@ async def create_song(song: SongSchema, db: Session = Depends(get_db)):
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
-async def get_song(song_id: str, db: Session = Depends(get_db)):
+async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)):
     """
     Returns the song with the given id.
     """
+
+    user = request.state.user
 
     find_song = db.query(Song).filter(Song.id == song_id).first()
 
     if not find_song:
         raise not_found_error("Song")
+
+    user_rating = db.query(Rating).filter(Rating.user_id == user.id, Rating.song_id == song_id).first()
 
     total_ratings = sum(rating.rating for rating in find_song.ratings)
     num_ratings = len(find_song.ratings) if find_song.ratings else 0
@@ -86,7 +90,11 @@ async def get_song(song_id: str, db: Session = Depends(get_db)):
             "album": find_song.album,
             "genre": find_song.genre,
             "length": find_song.length,
-            "ratings": {"total": num_ratings, "avg": average_rating},
+            "ratings": {
+                "total": num_ratings,
+                "avg": average_rating,
+                "user": user_rating.rating if user_rating else 0
+            },
         },
     }
 

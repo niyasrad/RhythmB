@@ -13,3 +13,4 @@ pre-commit
 python-multipart
 requests
 pandas
+yt_dlp
