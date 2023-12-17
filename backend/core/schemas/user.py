@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 from pydantic import BaseModel, Field, EmailStr
 from core.models.user import UserRole
 
@@ -8,6 +8,7 @@ class User(BaseModel):
     email: EmailStr = Field(..., example="china@gmail.com")
     password: str = Field(..., example="password")
     role: UserRole = Field(..., example="admin")
+    interests: List[str] = Field(..., example="['pop']")
 
 
 class UserOpt(BaseModel):

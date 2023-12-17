@@ -15,10 +15,12 @@ html, body, #root {
 
   --primary-color: #0CC0DF;
   --secondary-color: #5CE1E6;
+  --tertiary-color: #3D0079;
 
   --large-font-size: 2.5rem;
   --medium-font-size: 1.5rem;
-  --small-font-size: 1.1rem;
+  --small-font-size: 1.3rem;
+  --ultra-small-font-size: 1rem;
 
   --primary-font-color: #000000;
   --secondary-font-color: #FFFFFF;
@@ -31,6 +33,11 @@ html, body, #root {
   --border-radius-medium: 0.5rem;
   --border-radius-small: 0.25rem;
 
+}
+
+body {
+  background-color: #000000;
+  color: white;
 }
 
 h1 {
@@ -46,4 +53,9 @@ h2 {
 h3 {
   font-size: var(--small-font-size);
   letter-spacing: 0;
+}
+
+p {
+  font-size: var(--ultra-small-font-size);
+  letter-spacing: 0.02rem;
 }

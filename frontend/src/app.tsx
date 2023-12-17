@@ -5,6 +5,8 @@ import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalContext, defaultGlobalContextValue } from "./contexts/global.context";
 import axios from "axios";
+import Layout from "./components/layout/layout";
+import Home from "./containers/home/home";
 
 const SignIn = lazy(() => import("./containers/auth/signin"));
 const SignUp = lazy(() => import("./containers/auth/signup"));
@@ -76,13 +78,16 @@ export default function App() {
   return (
     <AppWrapper>
       <BrowserRouter>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Routes>
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="*" element={<div>Not Found</div>} />
-          </Routes>
-        </Suspense>
+        <Layout>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Routes>
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/" element={<Home />} />
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </Suspense>
+        </Layout>
       </BrowserRouter>
       <ToastContainer />
     </AppWrapper>

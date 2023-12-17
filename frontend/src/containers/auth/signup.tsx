@@ -5,11 +5,14 @@ import { toast } from "react-toastify"
 import { useGlobalContext } from "../../contexts/global.context"
 import { useNavigate } from "react-router"
 import { handleAPIError } from "../../utils/errors.util"
+import Genres from "./genres"
 
 export interface SignUpForm {
     username: string,
     email: string,
     password: string,
+    role: string,
+    interests: string[]
 }
 
 export default function SignUp() {
@@ -17,19 +20,30 @@ export default function SignUp() {
     const { handleLogIn } = useGlobalContext()
     const navigate = useNavigate()
 
+    const [detailsEntered, setDetailsEntered] = useState<boolean>(false)  
+
     const [form, setForm] = useState<SignUpForm>({
         username: "",
         email: "",
-        password: ""
+        password: "",
+        role: "common",
+        interests: []
     })
 
     const handleFormSubmit = async () => {
 
         for (const field in form) {
+            if (field === "genres") continue
+
             if (form[field as keyof SignUpForm] === "") {
                 toast.error("Please fill all the fields!")
                 return
             }
+        }
+
+        if (!detailsEntered) {
+            setDetailsEntered(true) 
+            return
         }
 
         try {
@@ -43,6 +57,8 @@ export default function SignUp() {
 
         }
         catch(e) {
+
+            setDetailsEntered(false)
 
             if (axios.isAxiosError(e)) {
                 toast.error(handleAPIError(e))
@@ -58,6 +74,13 @@ export default function SignUp() {
         setForm({
             ...form,
             [e.target.name]: e.target.value
+        })
+    }
+
+    const handleGenresChange = (interests: string[]) => {
+        setForm({
+            ...form,
+            interests: interests
         })
     }
 
@@ -84,6 +107,15 @@ export default function SignUp() {
             placeholder: "********"
         }
     ]
+
+    if (detailsEntered) {
+        return (
+            <Genres 
+                handleGenresChange={handleGenresChange}
+                handleFormSubmit={handleFormSubmit}
+            />
+        )
+    }
 
     return (
         <Auth

@@ -58,6 +58,7 @@ def initialize_indexes():
                 "email": {"type": "keyword"},
                 "hashed_password": {"type": "keyword"},
                 "role": {"type": "keyword"},
+                "interests": {"type": "keyword"}
             }
         }
     }

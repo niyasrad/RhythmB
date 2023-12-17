@@ -58,7 +58,7 @@ export const AuthForm = styled.div`
 
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
 
     @media only screen and (max-width: 990px) {
         width: 100%;
@@ -81,7 +81,7 @@ export const AuthTrademark = styled.div`
     }
 `
 
-export const AuthSwitch = styled.h3`
+export const AuthSwitch = styled.p`
     max-width: 80%;
 
     font-weight: 300;
@@ -103,7 +103,7 @@ export const AuthLogo = styled.img`
     object-fit: contain;
 `
 
-export const AuthVersion = styled.h3`
+export const AuthVersion = styled.p`
     font-weight: 500;
     color: var(--secondary-color);
 `
@@ -122,7 +122,7 @@ export const AuthFormFields = styled.div`
 
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
 `
 
 export const AuthFormField = styled.div`
@@ -130,12 +130,12 @@ export const AuthFormField = styled.div`
 
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.3rem;
 `
 
-export const AuthFormLabel = styled.h3`
+export const AuthFormLabel = styled.p`
     font-weight: 300;
-    color: var(--secondary-color);
+    color: white;
 `
 
 export const AuthFormInput = styled.input`
@@ -143,19 +143,21 @@ export const AuthFormInput = styled.input`
     height: 2.5rem;
 
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 500;
 
-    border-radius: var(--border-radius-large);
+    border-radius: var(--border-radius-medium);
     border: none;
 
     padding: 0.5rem;
     box-sizing: border-box;
 
-    background-color: var(--tertiary-background-color);
+    background-color: var(--primary-background-color);
+    color: white;
 `
 
 export const AuthSubmit = styled.button<{ $loading: boolean }>`
     width: 10rem;
+    height: 2.5rem;
 
     align-self: flex-end;
     justify-self: end;
@@ -163,15 +165,51 @@ export const AuthSubmit = styled.button<{ $loading: boolean }>`
     padding: 0.2rem;
     box-sizing: border-box;
 
-    border: 0.2rem solid var(--primary-color);
-    border-radius: var(--border-radius-large);
-    background-color: var(--primary-background-color);
+    border: 0.1rem solid var(--tertiary-color);
+    border-radius: var(--border-radius-medium);
+    background-color: var(--tertiary-color);
+    color: white;
+    
 
     opacity: ${props => props.$loading ? 0.5 : 1};
     cursor: ${props => props.$loading ? "default" : "pointer"};
 
-    h2 {
-        font-weight: 600;
-        color: var(--primary-color);
+    transition: opacity 0.5s ease-in-out, background-color 0.1s ease-in-out;
+    
+
+    h3 {
+        font-weight: 400;
+    }
+
+    &:hover {
+        background-color: var(--tertiary-background-color);
+        color: black;
+        border: 0.1rem solid var(--primary-background-color);
+    }
+`
+
+export const GenreField = styled.p<{ $selected: boolean }>`
+    width: 100%;
+    height: auto;
+    padding: 1rem;
+    box-sizing: border-box;
+    text-align: justify;
+    
+    border: 0.1rem solid var(--tertiary-color);
+    border-radius: var(--border-radius-large);
+    background-color: ${props => props.$selected ? "var(--tertiary-color)" : "transparent"};
+
+    transition: all 0.2s ease-in-out;
+
+    cursor: pointer;
+    color: var(--secondary-color);
+
+    span {
+        color: ${props => props.$selected ? "var(--secondary-font-color)" : "var(--primary-color)"}; 
+        font-weight: 400;
+    }
+
+    &:hover {
+        border: 0.1rem solid white;
     }
 `
