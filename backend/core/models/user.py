@@ -1,6 +1,6 @@
 import enum
 import uuid
-from sqlalchemy import Enum, Column, Integer, String
+from sqlalchemy import Enum, Column, ARRAY, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -21,6 +21,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(Enum(UserRole), default=UserRole.COMMON)
+    interests = Column(ARRAY(String), default=['Pop', 'R&B', 'EDM', 'Rock'])
 
     playlists = relationship("Playlist", back_populates="user", cascade="all, delete")
     ratings = relationship("Rating", back_populates="user", cascade="all, delete")

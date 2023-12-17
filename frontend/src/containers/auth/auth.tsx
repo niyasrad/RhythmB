@@ -75,7 +75,7 @@ export default function Auth({ inputFields, authFormat, handleInputChange, handl
                         onClick={handleAuthSubmit}
                         $loading={loading}
                     >
-                        <h2>Vibe!</h2>
+                        <h3>{authFormat === "In" ? "Sign In" : "Sign Up"}</h3>
                     </AuthSubmit>
                     </AuthForm>
                     <AuthTrademark>

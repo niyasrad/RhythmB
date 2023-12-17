@@ -48,6 +48,7 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
             email=user.email,
             hashed_password=hashed_password,
             role=user.role,
+            interests=user.interests
         )
         db.add(new_user)
         db.commit()
@@ -59,6 +60,7 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
             "email": new_user.email,
             "role": str(user.role),
             "hashed_password": new_user.hashed_password,
+            "interests": new_user.interests
         }
 
         es.index(index="users", id=new_user.id, body=user_document)
