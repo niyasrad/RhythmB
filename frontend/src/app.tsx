@@ -6,10 +6,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { GlobalContext, defaultGlobalContextValue } from "./contexts/global.context";
 import axios from "axios";
 import Layout from "./components/layout/layout";
-import Home from "./containers/home/home";
 
 const SignIn = lazy(() => import("./containers/auth/signin"));
 const SignUp = lazy(() => import("./containers/auth/signup"));
+const Home = lazy(() => import("./containers/home/home"));
+const Search = lazy(() => import("./containers/search/search"));
 
 function AppWrapper({ children }: { children: React.ReactNode }) {
 
@@ -84,6 +85,7 @@ export default function App() {
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/" element={<Home />} />
+              <Route path="/search" element={<Search />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </Suspense>

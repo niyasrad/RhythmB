@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
-export const AlbumWrapWrapper = styled.div`
+export const AlbumWrapWrapper = styled.div<{ $home: boolean }>`
     padding: 1.5rem;
     box-sizing: border-box;
-
-    width: 15rem;
+    
+    width: ${props => props.$home ? '15rem' : 'auto'};
 
     background-color: var(--secondary-background-color);
 
@@ -23,13 +23,13 @@ export const AlbumWrapWrapper = styled.div`
     }
 
     @media only screen and (max-width: 500px) {
-        width: 100%;
+        width: ${props => props.$home ? '100%' : '100%'};
     }
 `
 
 export const AlbumWrapImage = styled.img`
     object-fit: cover;
     width: 100%;
-    height: 100%;
+    height: auto;
     border-radius: 1rem;
 `

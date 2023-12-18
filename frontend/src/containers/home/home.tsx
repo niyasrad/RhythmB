@@ -4,8 +4,8 @@ import { useNavigate } from "react-router";
 
 import { useGlobalContext } from "../../contexts/global.context";
 
-import { DescText, HeaderTextHigh, HeaderTextLow, SubTextLow } from "../../components/index.styles";
-import { HomeAlbumsList, HomeArtist, HomeArtistDiscography, HomeArtistIntro, HomeSongs, HomeSongsList, HomeWrapper } from "./home.styles";
+import { DescText, HeaderTextHigh, HeaderTextLow } from "../../components/index.styles";
+import { HomeAlbumsList, HomeArtist, HomeArtistIntro, HomeSongs, HomeSongsList, HomeWrapper } from "./home.styles";
 
 import Song from "../../components/song/song";
 import AlbumWrap from "../../components/albumwrap/albumwrap";
@@ -109,7 +109,7 @@ export default function Home() {
                 <HomeArtistIntro>
                     <DescText>Check out this artist,</DescText>
                     <HeaderTextHigh>{artistName}</HeaderTextHigh>
-                    <SubTextLow>We think you'd <span>love</span> their albums!</SubTextLow>
+                    <DescText>We think you'd <span>love</span> their albums!</DescText>
                 </HomeArtistIntro>
                 <HomeAlbumsList>
                 {
@@ -117,16 +117,11 @@ export default function Home() {
                         <AlbumWrap
                             key={index}
                             album_id={albumID}
+                            home={true}
                         />
                     ))
                 }
                 </HomeAlbumsList>
-                <HomeArtistIntro>
-                    <SubTextLow>Visit {artistName}’s <span>Discography</span></SubTextLow>
-                    <HomeArtistDiscography
-                        size="6rem"
-                    />
-                </HomeArtistIntro>
             </HomeArtist>
         </HomeWrapper>
     )
