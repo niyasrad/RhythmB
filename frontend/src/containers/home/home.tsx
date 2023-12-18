@@ -1,10 +1,74 @@
-import { DescText, HeaderTextHigh, HeaderTextLow, SubTextLow } from "../../components/index.styles";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router";
+
 import { useGlobalContext } from "../../contexts/global.context";
+
+import { DescText, HeaderTextHigh, HeaderTextLow, SubTextLow } from "../../components/index.styles";
 import { HomeAlbumsList, HomeArtist, HomeArtistDiscography, HomeArtistIntro, HomeSongs, HomeSongsList, HomeWrapper } from "./home.styles";
+
+import Song from "../../components/song/song";
+import AlbumWrap from "../../components/albumwrap/albumwrap";
+import { ArtistAlbumSearchResult, SongSearchResult } from "../../utils/responses.util";
 
 export default function Home() {
 
-    const { username } = useGlobalContext()
+    const { username, isLoading, isLoggedIn, handleSignOut } = useGlobalContext()
+
+    const [loading, setLoading] = useState<boolean>(true)
+
+    const [artistID, setArtistID] = useState<string | null>(null)
+    const [artistName, setArtistName] = useState<string | null>(null)
+
+    const [albumIDs, setAlbumIDs] = useState<string[]>([])
+    const [songIDs, setSongIDs] = useState<string[]>([])
+
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!isLoading && !isLoggedIn) {
+            handleSignOut!()
+            navigate('/sign-in')
+            return
+        }
+
+        axios.get(import.meta.env.VITE_BASE_API + '/search/recommendation')
+        .then(res => {
+            const { artists, songs } = res.data.data
+            const pickArtist = artists[Math.floor(Math.random() * artists.length)];
+            setArtistID(pickArtist._id)
+
+            const pickSongs = songs.sort(() => 0.5 - Math.random()).slice(0, 5);
+            const songIDs = pickSongs.map((song: SongSearchResult) => song._id);
+            setSongIDs(songIDs)
+        })
+        .catch(() => {
+            handleSignOut!()
+            navigate('/sign-in')
+        })
+    }, [isLoggedIn, isLoading])
+
+
+
+    useEffect(() => {
+        if (artistID) {
+            axios.get(import.meta.env.VITE_BASE_API + `/artist/${artistID}`)
+            .then(res => {
+                const albums = res.data.data.albums
+                setArtistName(res.data.data.name)
+                const firstTwoAlbums = albums.slice(0, 2).map((album: ArtistAlbumSearchResult) => album.id);
+                setAlbumIDs(firstTwoAlbums)
+            })
+            .catch(() => {
+                handleSignOut!()
+                navigate('/sign-in')
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+        }
+    }, [artistID])
+
     
     const timeOfDay = () => {
 
@@ -22,6 +86,8 @@ export default function Home() {
 
     }   
 
+    if (loading) return null
+
 
     return (
         <HomeWrapper>
@@ -29,18 +95,34 @@ export default function Home() {
             <HomeSongs>
                 <DescText>Spice up your {timeOfDay()} with these tracks!</DescText>
                 <HomeSongsList>
+                {
+                    songIDs.map((songID, index) => (
+                        <Song 
+                            key={index}
+                            song_id={songID}
+                        />
+                    ))
+                }
                 </HomeSongsList>
             </HomeSongs>
             <HomeArtist>
                 <HomeArtistIntro>
                     <DescText>Check out this artist,</DescText>
-                    <HeaderTextHigh>SHINee</HeaderTextHigh>
+                    <HeaderTextHigh>{artistName}</HeaderTextHigh>
                     <SubTextLow>We think you'd <span>love</span> their albums!</SubTextLow>
                 </HomeArtistIntro>
                 <HomeAlbumsList>
+                {
+                    albumIDs.map((albumID, index) => (
+                        <AlbumWrap 
+                            key={index}
+                            album_id={albumID}
+                        />
+                    ))
+                }
                 </HomeAlbumsList>
                 <HomeArtistIntro>
-                    <SubTextLow>Visit SHINee’s <span>Discography</span></SubTextLow>
+                    <SubTextLow>Visit {artistName}’s <span>Discography</span></SubTextLow>
                     <HomeArtistDiscography 
                         size="6rem"
                     />
