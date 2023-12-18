@@ -58,7 +58,7 @@ def initialize_indexes():
                 "email": {"type": "keyword"},
                 "hashed_password": {"type": "keyword"},
                 "role": {"type": "keyword"},
-                "interests": {"type": "keyword"}
+                "interests": {"type": "keyword"},
             }
         }
     }
@@ -70,7 +70,7 @@ def initialize_indexes():
                 "title": {"type": "text"},
                 "user_id": {"type": "keyword"},
                 "username": {"type": "text"},
-                "songs": {"type": "nested"}
+                "songs": {"type": "nested"},
             }
         }
     }

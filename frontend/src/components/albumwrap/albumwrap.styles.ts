@@ -20,7 +20,7 @@ export const AlbumWrapWrapper = styled.div`
 
     &:hover {
         background-color: var(--tertiary-color);
-    
+
     }
 `
 

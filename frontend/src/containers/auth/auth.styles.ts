@@ -169,13 +169,13 @@ export const AuthSubmit = styled.button<{ $loading: boolean }>`
     border-radius: var(--border-radius-medium);
     background-color: var(--tertiary-color);
     color: white;
-    
+
 
     opacity: ${props => props.$loading ? 0.5 : 1};
     cursor: ${props => props.$loading ? "default" : "pointer"};
 
     transition: opacity 0.5s ease-in-out, background-color 0.1s ease-in-out;
-    
+
 
     h3 {
         font-weight: 400;
@@ -194,7 +194,7 @@ export const GenreField = styled.p<{ $selected: boolean }>`
     padding: 1rem;
     box-sizing: border-box;
     text-align: justify;
-    
+
     border: 0.1rem solid var(--tertiary-color);
     border-radius: var(--border-radius-large);
     background-color: ${props => props.$selected ? "var(--tertiary-color)" : "transparent"};
@@ -205,7 +205,7 @@ export const GenreField = styled.p<{ $selected: boolean }>`
     color: var(--secondary-color);
 
     span {
-        color: ${props => props.$selected ? "var(--secondary-font-color)" : "var(--primary-color)"}; 
+        color: ${props => props.$selected ? "var(--secondary-font-color)" : "var(--primary-color)"};
         font-weight: 400;
     }
 

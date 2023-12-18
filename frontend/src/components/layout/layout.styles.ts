@@ -16,3 +16,7 @@ export const LayoutWrapper = styled.div`
         grid-template-rows: 1fr 6.5rem 6.5rem;
     }
 `
+
+export const RhythmbAudio = styled.audio`
+    display: none;
+`

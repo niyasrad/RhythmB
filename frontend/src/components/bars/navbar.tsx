@@ -10,7 +10,7 @@ export default function NavBar({ mobileMode }: { mobileMode?: boolean }) {
     const { pathname } = useLocation()
     const navigate = useNavigate()
     const { handleSignOut } = useGlobalContext()
-    
+
     if (pathname === "/sign-in" || pathname === "/sign-up") {
         return null
     }
@@ -22,7 +22,7 @@ export default function NavBar({ mobileMode }: { mobileMode?: boolean }) {
             <BarIcon
                 onClick={() => navigate("/")}
             >
-                <BarImage 
+                <BarImage
                     src={light_logo}
                     alt="RhythmB Logo"
                 />
@@ -31,7 +31,7 @@ export default function NavBar({ mobileMode }: { mobileMode?: boolean }) {
                 onClick={() => navigate("/search")}
                 $selected={pathname === '/search'}
             >
-                <MagnifyingGlass 
+                <MagnifyingGlass
                     size={"2rem"}
                 />
             </BarIcon>
@@ -39,7 +39,7 @@ export default function NavBar({ mobileMode }: { mobileMode?: boolean }) {
                 onClick={() => navigate("/playlists")}
                 $selected={pathname === '/playlists'}
             >
-                <Bars3BottomLeft 
+                <Bars3BottomLeft
                     size={"2rem"}
                 />
             </BarIcon>
@@ -47,7 +47,7 @@ export default function NavBar({ mobileMode }: { mobileMode?: boolean }) {
                 onClick={() => navigate("/ratings")}
                 $selected={pathname === '/ratings'}
             >
-                <Heart 
+                <Heart
                     size={"2rem"}
                 />
             </BarIcon>
@@ -57,7 +57,7 @@ export default function NavBar({ mobileMode }: { mobileMode?: boolean }) {
                     navigate('/sign-in')
                 }}
             >
-                <ArrowLeftOnRectangle 
+                <ArrowLeftOnRectangle
                     size={"2rem"}
                 />
             </BarIcon>

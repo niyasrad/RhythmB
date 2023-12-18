@@ -69,11 +69,11 @@ export default function Home() {
         }
     }, [artistID])
 
-    
+
     const timeOfDay = () => {
 
         const time = new Date().getHours()
-        
+
         if (time >= 5 && time < 12) {
             return "morning"
         } else if (time >= 12 && time < 16) {
@@ -84,7 +84,7 @@ export default function Home() {
             return "night"
         }
 
-    }   
+    }
 
     if (loading) return null
 
@@ -97,7 +97,7 @@ export default function Home() {
                 <HomeSongsList>
                 {
                     songIDs.map((songID, index) => (
-                        <Song 
+                        <Song
                             key={index}
                             song_id={songID}
                         />
@@ -114,7 +114,7 @@ export default function Home() {
                 <HomeAlbumsList>
                 {
                     albumIDs.map((albumID, index) => (
-                        <AlbumWrap 
+                        <AlbumWrap
                             key={index}
                             album_id={albumID}
                         />
@@ -123,7 +123,7 @@ export default function Home() {
                 </HomeAlbumsList>
                 <HomeArtistIntro>
                     <SubTextLow>Visit {artistName}’s <span>Discography</span></SubTextLow>
-                    <HomeArtistDiscography 
+                    <HomeArtistDiscography
                         size="6rem"
                     />
                 </HomeArtistIntro>

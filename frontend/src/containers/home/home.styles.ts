@@ -6,7 +6,7 @@ export const HomeWrapper = styled.div`
     height: 90%;
     background-color: var(--secondary-background-color);
 
-    padding: 2.5rem;    
+    padding: 2.5rem;
     box-sizing: border-box;
 
     border-radius: 1rem;
@@ -104,8 +104,8 @@ export const HomeAlbumsList = styled.div`
     height: auto;
 
     display: flex;
-    
-    gap: 2rem;  
+
+    gap: 2rem;
     flex-wrap: wrap;
 
 `

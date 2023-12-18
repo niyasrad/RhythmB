@@ -37,7 +37,7 @@ export default function AlbumWrap({ album_id }: { album_id: string}) {
 
     return (
         <AlbumWrapWrapper>
-            <AlbumWrapImage 
+            <AlbumWrapImage
                 src={import.meta.env.VITE_BASE_API + "/cdn_asset/albums/" + album_id + '.jpg'}
                 alt="Album Image"
             />

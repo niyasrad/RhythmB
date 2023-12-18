@@ -53,7 +53,7 @@ export default function Genres({ handleGenresChange, handleFormSubmit }: GenresP
     return (
         <AuthWrapper>
             <AuthContent>
-                <AuthHeader 
+                <AuthHeader
                     src={logo_large}
                     alt="RhythmB"
                 />
@@ -93,5 +93,5 @@ export default function Genres({ handleGenresChange, handleFormSubmit }: GenresP
         </AuthWrapper>
     )
 
-    
+
 }

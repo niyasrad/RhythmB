@@ -46,7 +46,7 @@ async def create_playlist(
             "title": new_playlist.title,
             "user_id": new_playlist.user_id,
             "username": new_playlist.user.username,
-            "songs": new_playlist.songs
+            "songs": new_playlist.songs,
         }
 
         es.index(index="playlists", id=new_playlist.id, body=playlist_document)
@@ -294,7 +294,7 @@ async def remove_song_from_playlist(
             body={
                 "script": {
                     "source": "ctx._source.songs.removeIf(song -> song.id == params.id)",
-                    "params": {"id": find_song.id}
+                    "params": {"id": find_song.id},
                 },
             },
         )

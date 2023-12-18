@@ -8,7 +8,7 @@ export const HeaderTextHigh = styled.p`
     letter-spacing: -0.08rem;
     user-select: none;
 
-    display: block; 
+    display: block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -44,7 +44,7 @@ export const SubTextHigh = styled.p`
     letter-spacing: 0.02rem;
     user-select: none;
 
-    display: block; 
+    display: block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

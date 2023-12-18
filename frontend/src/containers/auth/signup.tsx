@@ -20,7 +20,7 @@ export default function SignUp() {
     const { handleLogIn } = useGlobalContext()
     const navigate = useNavigate()
 
-    const [detailsEntered, setDetailsEntered] = useState<boolean>(false)  
+    const [detailsEntered, setDetailsEntered] = useState<boolean>(false)
 
     const [form, setForm] = useState<SignUpForm>({
         username: "",
@@ -42,7 +42,7 @@ export default function SignUp() {
         }
 
         if (!detailsEntered) {
-            setDetailsEntered(true) 
+            setDetailsEntered(true)
             return
         }
 
@@ -110,7 +110,7 @@ export default function SignUp() {
 
     if (detailsEntered) {
         return (
-            <Genres 
+            <Genres
                 handleGenresChange={handleGenresChange}
                 handleFormSubmit={handleFormSubmit}
             />

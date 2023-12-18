@@ -134,7 +134,13 @@ async def delete_album(album_id: str, db: Session = Depends(get_db)):
         raise not_found_error("album")
 
     del_query = {"query": {"term": {"album_id": find_album.id}}}
-    del_playlist_song_query = {"script": {"source": "ctx._source.songs.removeIf(song -> song.album_id == params.album_id)", "lang": "painless", "params": {"album_id": find_album.id}}}
+    del_playlist_song_query = {
+        "script": {
+            "source": "ctx._source.songs.removeIf(song -> song.album_id == params.album_id)",
+            "lang": "painless",
+            "params": {"album_id": find_album.id},
+        }
+    }
 
     try:
         db.delete(find_album)

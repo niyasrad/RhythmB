@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 export const BarWrapper = styled.div<{ $mobileMode: boolean }>`
     width: 4.5rem;
@@ -58,8 +58,21 @@ export const BarIcon = styled.div<{ $white ?: boolean, $color ?: string, $select
     }
 `
 
-export const BarImage = styled.img`
+export const BarImage = styled.img<{ $rotate ?: boolean }>`
     width: 100%;
     height: 100%;
     object-fit: cover;
+
+    animation: ${props => props.$rotate ? ImageRotation : "none"} 3s linear infinite;
+    transition: all 3s ease-in-out;
+`
+
+export const ImageRotation = keyframes`
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 `
