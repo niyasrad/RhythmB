@@ -3,7 +3,7 @@ import { ArrowRightCircle } from "@styled-icons/heroicons-solid";
 
 export const HomeWrapper = styled.div`
     width: 100%;
-    height: 80%;
+    height: 90%;
     background-color: var(--secondary-background-color);
 
     padding: 2.5rem;    

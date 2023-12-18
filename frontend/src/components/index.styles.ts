@@ -7,6 +7,11 @@ export const HeaderTextHigh = styled.p`
     color: var(--primary-color);
     letter-spacing: -0.08rem;
     user-select: none;
+
+    display: block; 
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 `
 
 export const HeaderTextLow = styled.p`
@@ -38,6 +43,11 @@ export const SubTextHigh = styled.p`
     color: white;
     letter-spacing: 0.02rem;
     user-select: none;
+
+    display: block; 
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     span {
         color: var(--primary-color);
