@@ -85,7 +85,7 @@ async def recommendation(request: Request):
     """
 
     user = request.state.user
-    
+
     search_query = {
         "query": {
             "more_like_this": {
@@ -105,7 +105,10 @@ async def recommendation(request: Request):
         artist_results = es.search(index=["artists"], body=search_query)
         artist_hits = artist_results.get("hits", {}).get("hits", [])
 
-        return {"message": "Recommendation Results", "data": {"songs": song_hits, "artists": artist_hits}}
+        return {
+            "message": "Recommendation Results",
+            "data": {"songs": song_hits, "artists": artist_hits},
+        }
     except Exception as e:
         raise e
 
@@ -139,4 +142,3 @@ async def related_albums(id: str):
         return {"message": "Related Albums", "data": hits}
     except Exception as e:
         raise e
-    

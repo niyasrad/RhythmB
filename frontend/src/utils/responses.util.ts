@@ -13,7 +13,7 @@ export interface SongSearchResult {
       length: number,
     },
 }
-  
+
 
 export interface ArtistAlbumSearchResult {
     title: string,

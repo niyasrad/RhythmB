@@ -127,50 +127,54 @@ async def populate_csv(
                 es.index(index="songs", id=song_db.id, body=song_document)
 
                 ydl_opts = {
-                    'format': 'worstaudio/worst',
-                    'postprocessors': [{
-                        'key': 'FFmpegExtractAudio',
-                        'preferredcodec': 'mp3',
-                        'preferredquality': '64',
-                    }],
-                    'outtmpl': f'cdn_assets/songs/{song_db.id}.%(ext)s',
-                    'noplaylist': True, 
+                    "format": "worstaudio/worst",
+                    "postprocessors": [
+                        {
+                            "key": "FFmpegExtractAudio",
+                            "preferredcodec": "mp3",
+                            "preferredquality": "64",
+                        }
+                    ],
+                    "outtmpl": f"cdn_assets/songs/{song_db.id}.%(ext)s",
+                    "noplaylist": True,
                 }
 
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     try:
-                        info_dict = ydl.extract_info(f'ytsearch1:{artist_name}-{artist_album_song["title"]}', download=False)['entries'][0]
+                        info_dict = ydl.extract_info(
+                            f'ytsearch1:{artist_name}-{artist_album_song["title"]}',
+                            download=False,
+                        )["entries"][0]
                         if info_dict:
-                            video_url = info_dict['url']
+                            video_url = info_dict["url"]
                             ydl.download([video_url])
                     except yt_dlp.utils.DownloadError as e:
                         continue
 
-
             encoded_album_name = quote(artist_album_name)
-        
+
             try:
-                last_fm_response = requests.get(f'https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key={LAST_FM_API_KEY}&artist={artist_name}&album={encoded_album_name}&format=json')
+                last_fm_response = requests.get(
+                    f"https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key={LAST_FM_API_KEY}&artist={artist_name}&album={encoded_album_name}&format=json"
+                )
                 response_json = last_fm_response.json()
-                images = response_json['album']['image']
+                images = response_json["album"]["image"]
             except Exception as e:
                 raise handle_exception(e)
             if last_fm_response.status_code != 200:
                 raise not_found_error("album")
 
-            
-
             for image in images:
-                if 'size' in image and image['size'] == 'extralarge':
-                    img_url = image.get('#text')
+                if "size" in image and image["size"] == "extralarge":
+                    img_url = image.get("#text")
                     break
 
             file_name = f"{album_db.id}.jpg"
             makedirs(path.dirname(f"cdn_assets/albums/"), exist_ok=True)
-            
+
             if not img_url:
                 continue
-            
+
             try:
                 response = requests.get(img_url)
             except Exception as e:

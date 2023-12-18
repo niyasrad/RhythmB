@@ -20,7 +20,7 @@ export const SongWrapper = styled.div`
 
     &:hover {
         background-color: var(--tertiary-color);
-    
+
     }
 `
 

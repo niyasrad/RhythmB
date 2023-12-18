@@ -75,7 +75,11 @@ async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)
     if not find_song:
         raise not_found_error("Song")
 
-    user_rating = db.query(Rating).filter(Rating.user_id == user.id, Rating.song_id == song_id).first()
+    user_rating = (
+        db.query(Rating)
+        .filter(Rating.user_id == user.id, Rating.song_id == song_id)
+        .first()
+    )
 
     total_ratings = sum(rating.rating for rating in find_song.ratings)
     num_ratings = len(find_song.ratings) if find_song.ratings else 0
@@ -93,7 +97,7 @@ async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)
             "ratings": {
                 "total": num_ratings,
                 "avg": average_rating,
-                "user": user_rating.rating if user_rating else 0
+                "user": user_rating.rating if user_rating else 0,
             },
         },
     }
@@ -156,7 +160,13 @@ async def delete_song(song_id: str, db: Session = Depends(get_db)):
         raise not_found_error("Song")
 
     del_query = {"query": {"term": {"song_id": find_song.id}}}
-    del_playlist_song_query = {"script": {"source": "ctx._source.songs.removeIf(song -> song.id == params.song_id)", "lang": "painless", "params": {"song_id": find_song.id}}}
+    del_playlist_song_query = {
+        "script": {
+            "source": "ctx._source.songs.removeIf(song -> song.id == params.song_id)",
+            "lang": "painless",
+            "params": {"song_id": find_song.id},
+        }
+    }
 
     try:
         db.delete(find_song)

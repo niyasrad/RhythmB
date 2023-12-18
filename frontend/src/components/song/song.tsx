@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 import { SubTextHigh } from "../index.styles";
 import { SongWrapper, SongImage, SongPlay } from "./song.styles";
+import { usePlayerContext } from "../../contexts/player.context";
 
 interface SongDetails {
     title: string,
@@ -20,6 +21,8 @@ export default function Song({ song_id }: { song_id: string }) {
         album: '',
         album_id: ''
     })
+
+    const { setSongID, setAlbumID } = usePlayerContext()
 
     useEffect(() => {
         axios.get(import.meta.env.VITE_BASE_API + '/song/' + song_id)
@@ -40,14 +43,18 @@ export default function Song({ song_id }: { song_id: string }) {
 
     return (
         <SongWrapper>
-            <SongImage 
+            <SongImage
                 src={import.meta.env.VITE_BASE_API + "/cdn_asset/albums/" + songDetails.album_id + '.jpg'}
                 alt="Song Image"
             />
             <SubTextHigh><span>{songDetails.title}</span></SubTextHigh>
             <SubTextHigh>{songDetails.artist}</SubTextHigh>
-            <SongPlay 
+            <SongPlay
                 size="4rem"
+                onClick={() => {
+                    setSongID!(song_id)
+                    setAlbumID!(songDetails.album_id)
+                }}
             />
         </SongWrapper>
     )

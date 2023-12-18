@@ -21,7 +21,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(Enum(UserRole), default=UserRole.COMMON)
-    interests = Column(ARRAY(String), default=['Pop', 'R&B', 'EDM', 'Rock'])
+    interests = Column(ARRAY(String), default=["Pop", "R&B", "EDM", "Rock"])
 
     playlists = relationship("Playlist", back_populates="user", cascade="all, delete")
     ratings = relationship("Rating", back_populates="user", cascade="all, delete")
