@@ -6,6 +6,7 @@ import { useGlobalContext } from "../../contexts/global.context"
 import { useNavigate } from "react-router"
 import { handleAPIError } from "../../utils/errors.util"
 import Genres from "./genres"
+import Artists from "./artists"
 
 export interface SignUpForm {
     username: string,
@@ -21,13 +22,15 @@ export default function SignUp() {
     const navigate = useNavigate()
 
     const [detailsEntered, setDetailsEntered] = useState<boolean>(false)
+    const [genres, setGenres] = useState<string[]>([])
+    const [genresEntered, setGenresEntered] = useState<boolean>(false)
 
     const [form, setForm] = useState<SignUpForm>({
         username: "",
         email: "",
         password: "",
         role: "common",
-        interests: []
+        interests: [],
     })
 
     const handleFormSubmit = async () => {
@@ -43,6 +46,11 @@ export default function SignUp() {
 
         if (!detailsEntered) {
             setDetailsEntered(true)
+            return
+        }
+
+        if (!genresEntered && genres.length == 2) {
+            setGenresEntered(true)
             return
         }
 
@@ -77,7 +85,11 @@ export default function SignUp() {
         })
     }
 
-    const handleGenresChange = (interests: string[]) => {
+    const handleGenresChange = (genres: string[]) => {
+        setGenres(genres)
+    }
+
+    const handleArtistsChange = (interests: string[]) => {
         setForm({
             ...form,
             interests: interests
@@ -107,6 +119,16 @@ export default function SignUp() {
             placeholder: "********"
         }
     ]
+
+    if (detailsEntered && genresEntered) {
+        return (
+            <Artists
+                handleArtistsChange={handleArtistsChange}
+                genres={genres}
+                handleFormSubmit={handleFormSubmit}
+            />
+        )
+    }
 
     if (detailsEntered) {
         return (

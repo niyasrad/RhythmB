@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, status
 
+from urllib.parse import unquote
+
 from sqlalchemy.orm import Session
 from core.utils.search import es
 
@@ -73,6 +75,28 @@ async def get_artist(artist_id: str, db: Session = Depends(get_db)):
             "albums": find_artist.albums,
             "songs": find_artist.songs[0:5],
         },
+    }
+
+
+@router.get(
+    "/genre/{genre}",
+    status_code=status.HTTP_200_OK,
+)
+async def get_artists_by_genre(genre: str, db: Session = Depends(get_db)):
+    """
+    Returns the artists with the given genre.
+    """
+
+    decoded_genre = unquote(genre)
+
+    find_artists = db.query(Artist).filter(Artist.genre == decoded_genre).all()
+
+    if not find_artists:
+        raise not_found_error("artists")
+
+    return {
+        "message": "Artists Found!",
+        "data": find_artists,
     }
 
 

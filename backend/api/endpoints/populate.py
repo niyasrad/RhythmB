@@ -67,10 +67,32 @@ async def populate_csv(
         db.commit()
         db.refresh(artist_db)
 
+        try:
+            last_fm_response = requests.get(
+                f"https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist={artist_name}&api_key={LAST_FM_API_KEY}&format=json"
+            )
+            response_json = last_fm_response.json()
+            if "tags" in response_json["artist"]:
+                if isinstance(response_json["artist"]["tags"], str):
+                    artist_tags = [artist_db.genre]
+                else:
+                    tags = response_json["artist"]["tags"]["tag"]
+                    if isinstance(tags, list):
+                        artist_tags = [tag["name"] for tag in tags]
+                    elif isinstance(tags, dict):
+                        artist_tags = [tags["name"]]
+                    else:
+                        artist_tags = [artist_db.genre]
+            else:
+                artist_tags = [artist_db.genre]
+        except Exception as e:
+            raise handle_exception(e)
+
         artist_document = {
             "id": artist_db.id,
             "name": artist_db.name,
             "genre": artist_db.genre,
+            "tags": artist_tags,
         }
 
         es.index(index="artists", id=artist_db.id, body=artist_document)
@@ -85,71 +107,11 @@ async def populate_csv(
             db.commit()
             db.refresh(album_db)
 
-            album_document = {
-                "id": album_db.id,
-                "title": album_db.title,
-                "artist_id": album_db.artist_id,
-            }
-
-            es.index(index="albums", id=album_db.id, body=album_document)
-
             artist_album_songs = artist_df[
                 artist_df["album_title"] == artist_album_name
             ]
 
             makedirs(path.dirname(f"cdn_assets/songs/"), exist_ok=True)
-
-            for _, artist_album_song in artist_album_songs.iterrows():
-
-                song_db = Song(
-                    title=artist_album_song["title"],
-                    artist_id=artist_db.id,
-                    album_id=album_db.id,
-                    genre=artist_album_song["genre"],
-                    length=artist_album_song["length_ms"],
-                )
-
-                db.add(song_db)
-                db.commit()
-                db.refresh(song_db)
-
-                song_document = {
-                    "id": song_db.id,
-                    "title": song_db.title,
-                    "artist_id": song_db.artist_id,
-                    "album_id": song_db.album_id,
-                    "artist_name": artist_db.name,
-                    "album_title": album_db.title,
-                    "genre": song_db.genre,
-                    "length": song_db.length,
-                }
-
-                es.index(index="songs", id=song_db.id, body=song_document)
-
-                ydl_opts = {
-                    "format": "worstaudio/worst",
-                    "postprocessors": [
-                        {
-                            "key": "FFmpegExtractAudio",
-                            "preferredcodec": "mp3",
-                            "preferredquality": "64",
-                        }
-                    ],
-                    "outtmpl": f"cdn_assets/songs/{song_db.id}.%(ext)s",
-                    "noplaylist": True,
-                }
-
-                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    try:
-                        info_dict = ydl.extract_info(
-                            f'ytsearch1:{artist_name}-{artist_album_song["title"]}',
-                            download=False,
-                        )["entries"][0]
-                        if info_dict:
-                            video_url = info_dict["url"]
-                            ydl.download([video_url])
-                    except yt_dlp.utils.DownloadError as e:
-                        continue
 
             encoded_album_name = quote(artist_album_name)
 
@@ -159,6 +121,19 @@ async def populate_csv(
                 )
                 response_json = last_fm_response.json()
                 images = response_json["album"]["image"]
+                if "tags" in response_json["album"]:
+                    if isinstance(response_json["album"]["tags"], str):
+                        album_tags = [artist_tags]
+                    else:
+                        tags = response_json["album"]["tags"]["tag"]
+                        if isinstance(tags, list):
+                            album_tags = [tag["name"] for tag in tags]
+                        elif isinstance(tags, dict):
+                            album_tags = [tags["name"]]
+                        else:
+                            album_tags = [artist_tags]
+                else:
+                    album_tags = [artist_tags]
             except Exception as e:
                 raise handle_exception(e)
             if last_fm_response.status_code != 200:
@@ -187,5 +162,67 @@ async def populate_csv(
                     f.write(response.content)
             except Exception as e:
                 raise handle_exception(e)
+
+            album_document = {
+                "id": album_db.id,
+                "title": album_db.title,
+                "artist_id": album_db.artist_id,
+                "tags": album_tags,
+            }
+
+            es.index(index="albums", id=album_db.id, body=album_document)
+
+            for _, artist_album_song in artist_album_songs.iterrows():
+
+                song_db = Song(
+                    title=artist_album_song["title"],
+                    artist_id=artist_db.id,
+                    album_id=album_db.id,
+                    genre=artist_album_song["genre"],
+                    length=artist_album_song["length_ms"],
+                )
+
+                db.add(song_db)
+                db.commit()
+                db.refresh(song_db)
+
+                song_document = {
+                    "id": song_db.id,
+                    "title": song_db.title,
+                    "artist_id": song_db.artist_id,
+                    "album_id": song_db.album_id,
+                    "artist_name": artist_db.name,
+                    "album_title": album_db.title,
+                    "genre": song_db.genre,
+                    "length": song_db.length,
+                    "tags": album_tags,
+                }
+
+                es.index(index="songs", id=song_db.id, body=song_document)
+
+                ydl_opts = {
+                    "format": "worstaudio/worst",
+                    "postprocessors": [
+                        {
+                            "key": "FFmpegExtractAudio",
+                            "preferredcodec": "mp3",
+                            "preferredquality": "64",
+                        }
+                    ],
+                    "outtmpl": f"cdn_assets/songs/{song_db.id}.%(ext)s",
+                    "noplaylist": True,
+                }
+
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    try:
+                        info_dict = ydl.extract_info(
+                            f'ytsearch1:{artist_name}-{artist_album_song["title"]}',
+                            download=False,
+                        )["entries"][0]
+                        if info_dict:
+                            video_url = info_dict["url"]
+                            ydl.download([video_url])
+                    except yt_dlp.utils.DownloadError as e:
+                        continue
 
     return {"message": "CSV File Uploaded Successfully!"}

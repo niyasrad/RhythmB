@@ -4,7 +4,7 @@ export const AlbumWrapWrapper = styled.div`
     padding: 1.5rem;
     box-sizing: border-box;
 
-    min-width: 15rem;
+    width: 15rem;
 
     background-color: var(--secondary-background-color);
 
@@ -20,11 +20,16 @@ export const AlbumWrapWrapper = styled.div`
 
     &:hover {
         background-color: var(--tertiary-color);
+    }
 
+    @media only screen and (max-width: 500px) {
+        width: 100%;
     }
 `
 
 export const AlbumWrapImage = styled.img`
     object-fit: cover;
+    width: 100%;
+    height: 100%;
     border-radius: 1rem;
 `

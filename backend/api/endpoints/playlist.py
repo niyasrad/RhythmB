@@ -215,6 +215,7 @@ async def add_song_to_playlist(
             "album_title": find_song.album.title,
             "genre": find_song.genre,
             "length": find_song.length,
+            "tags": find_song.tags,
         }
 
         es.update(

@@ -35,16 +35,6 @@ const genresDetails: GenreType[] = [
 export default function Genres({ handleGenresChange, handleFormSubmit }: GenresProps) {
 
     const [genres, setGenres] = useState<string[]>([])
-    const [loading, setLoading] = useState<boolean>(false)
-
-    const handleAuthSubmit = async () => {
-        if (loading || genres.length !== 2) {
-            return
-        }
-        setLoading(true)
-        await handleFormSubmit()
-        setLoading(false)
-    }
 
     useEffect(() => {
         handleGenresChange(genres)
@@ -83,8 +73,8 @@ export default function Genres({ handleGenresChange, handleFormSubmit }: GenresP
                     }
                     </AuthFormFields>
                     <AuthSubmit
-                        onClick={handleAuthSubmit}
-                        $loading={loading || genres.length !== 2}
+                        onClick={handleFormSubmit}
+                        $loading={genres.length !== 2}
                     >
                         <h3>Sign Up</h3>
                     </AuthSubmit>
