@@ -86,13 +86,18 @@ async def recommendation(request: Request):
 
     user = request.state.user
 
+    like_documents = []
+
+    for artist_id in user.interests:
+        like_documents.append({"_index": "artists", "_id": artist_id})
+
     search_query = {
         "query": {
             "more_like_this": {
-                "fields": ["genre"],
-                "like": user.interests,
+                "fields": ["title", "tags"],
+                "like": like_documents,
                 "min_term_freq": 1,
-                "max_query_terms": 20,
+                "max_query_terms": 25,
             }
         },
     }
@@ -102,7 +107,7 @@ async def recommendation(request: Request):
         song_results = es.search(index=["songs"], body=search_query)
         song_hits = song_results.get("hits", {}).get("hits", [])
 
-        artist_results = es.search(index=["artists"], body=search_query)
+        artist_results = es.search(index=["artists"], body=search_query, size=2)
         artist_hits = artist_results.get("hits", {}).get("hits", [])
 
         return {

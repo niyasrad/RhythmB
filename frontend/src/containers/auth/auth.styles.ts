@@ -213,3 +213,36 @@ export const GenreField = styled.p<{ $selected: boolean }>`
         border: 0.1rem solid white;
     }
 `
+
+export const ArtistFormFields = styled.div`
+    width: 100%;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+`
+
+export const ArtistField = styled.p<{ $selected: boolean }>`
+    height: auto;
+    padding: 1rem;
+    box-sizing: border-box;
+    text-align: justify;
+
+    border: 0.1rem solid var(--tertiary-color);
+    border-radius: var(--border-radius-large);
+    background-color: ${props => props.$selected ? "var(--tertiary-color)" : "transparent"};
+
+    transition: all 0.2s ease-in-out;
+
+    cursor: pointer;
+    color: var(--secondary-color);
+
+    span {
+        color: ${props => props.$selected ? "var(--secondary-font-color)" : "var(--primary-color)"};
+        font-weight: 400;
+    }
+
+    &:hover {
+        border: 0.1rem solid white;
+    }
+`
