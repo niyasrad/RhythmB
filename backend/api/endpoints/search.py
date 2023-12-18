@@ -15,7 +15,7 @@ router = APIRouter(
 @router.get(
     "/any", dependencies=[Depends(authenticate_common)], status_code=status.HTTP_200_OK
 )
-async def search(query: str, db: Session = Depends(get_db)):
+async def search(query: str):
     """
     Searches for a query in the database.
     """
@@ -30,6 +30,7 @@ async def search(query: str, db: Session = Depends(get_db)):
                     "album_title",
                     "artist_name",
                     "genre",
+                    "tags",
                     "username",
                 ],
                 "fuzziness": 2,

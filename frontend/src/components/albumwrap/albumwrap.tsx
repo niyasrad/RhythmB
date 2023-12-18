@@ -11,7 +11,7 @@ interface AlbumDetails {
     album: string
 }
 
-export default function AlbumWrap({ album_id }: { album_id: string}) {
+export default function AlbumWrap({ album_id, home }: { album_id: string, home: boolean}) {
 
     const [albumDetails, setAlbumDetails] = useState<AlbumDetails>({
         title: '',
@@ -36,7 +36,7 @@ export default function AlbumWrap({ album_id }: { album_id: string}) {
     if (!album_id) return null
 
     return (
-        <AlbumWrapWrapper>
+        <AlbumWrapWrapper $home={home}>
             <AlbumWrapImage
                 src={import.meta.env.VITE_BASE_API + "/cdn_asset/albums/" + album_id + '.jpg'}
                 alt="Album Image"
