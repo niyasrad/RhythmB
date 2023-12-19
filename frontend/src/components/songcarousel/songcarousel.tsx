@@ -22,7 +22,7 @@ export default function SongCarousel({ songIDs }: SongCarouselProps) {
 
     return (
         <CarouselList>
-            <CarouselLeft 
+            <CarouselLeft
                 size="4rem"
                 color="#FFF"
                 onClick={handlePrev}
@@ -43,7 +43,7 @@ export default function SongCarousel({ songIDs }: SongCarouselProps) {
             }
             </CarouselHiddenList>
             <GradientOverlayRight />
-            <CarouselRight 
+            <CarouselRight
                 size="4rem"
                 color="#FFF"
                 onClick={handleNext}

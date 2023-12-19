@@ -29,6 +29,7 @@ export const SongWrapper = styled.div`
 export const SongImage = styled.img`
     object-fit: cover;
     border-radius: 1rem;
+    user-select: none;
 `
 
 export const SongPlay = styled(PlayCircle)`
