@@ -1,9 +1,12 @@
 import styled from "styled-components";
-import { PlayCircle } from "@styled-icons/heroicons-solid";
+import { PlayCircle, PauseCircle } from "@styled-icons/heroicons-solid";
 
 export const SongWrapper = styled.div`
     position: relative;
     padding: 1.5rem;
+
+    width: 100%;
+
     box-sizing: border-box;
 
     background-color: var(--secondary-background-color);
@@ -20,7 +23,6 @@ export const SongWrapper = styled.div`
 
     &:hover {
         background-color: var(--tertiary-color);
-
     }
 `
 
@@ -34,6 +36,21 @@ export const SongPlay = styled(PlayCircle)`
     top: 105%;
     left: 50%;
     transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        width: 5rem;
+        height: 5rem;
+    }
+`
+
+export const SongPause = styled(PauseCircle)`
+    position: absolute;
+    top: 105%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--secondary-color);
     cursor: pointer;
     transition: all 0.2s ease-in-out;
 

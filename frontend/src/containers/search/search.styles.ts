@@ -70,7 +70,6 @@ export const SearchResultContainer = styled.div<{ $huge ?: boolean }>`
     height: auto;
 
     padding: 3rem;
-    padding-bottom: 5rem;
     box-sizing: border-box;
 
     border-radius: 1rem;

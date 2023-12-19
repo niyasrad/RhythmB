@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 import { SubTextHigh } from "../index.styles";
-import { SongWrapper, SongImage, SongPlay } from "./song.styles";
+import { SongWrapper, SongImage, SongPlay, SongPause } from "./song.styles";
 import { usePlayerContext } from "../../contexts/player.context";
 
 interface SongDetails {
@@ -22,7 +22,7 @@ export default function Song({ song_id }: { song_id: string }) {
         album_id: ''
     })
 
-    const { setSongID, setAlbumID } = usePlayerContext()
+    const { songID, isPlaying, setSongID, setAlbumID, setIsPlaying } = usePlayerContext()
 
     useEffect(() => {
         axios.get(import.meta.env.VITE_BASE_API + '/song/' + song_id)
@@ -49,13 +49,25 @@ export default function Song({ song_id }: { song_id: string }) {
             />
             <SubTextHigh><span>{songDetails.title}</span></SubTextHigh>
             <SubTextHigh>{songDetails.artist}</SubTextHigh>
-            <SongPlay
-                size="4rem"
-                onClick={() => {
-                    setSongID!(song_id)
-                    setAlbumID!(songDetails.album_id)
-                }}
-            />
+            {
+                songID === song_id && isPlaying ? 
+                <SongPause 
+                    size="4rem"
+                    onClick={() => {
+                        setIsPlaying!(false)
+                    }}
+                />
+                :
+                <SongPlay
+                    size="4rem"
+                    onClick={() => {
+                        setSongID!(song_id)
+                        setAlbumID!(songDetails.album_id)
+                        setIsPlaying!(true)
+                    }}
+                />
+            }
+            
         </SongWrapper>
     )
 }
