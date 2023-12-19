@@ -101,6 +101,7 @@ export const AuthLogo = styled.img`
     height: 5rem;
     width: 5rem;
     object-fit: contain;
+    user-select: none;
 `
 
 export const AuthVersion = styled.p`

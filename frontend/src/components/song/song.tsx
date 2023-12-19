@@ -10,7 +10,8 @@ interface SongDetails {
     title: string,
     artist: string,
     album: string,
-    album_id: string
+    album_id: string,
+    user_rating: number,
 }
 
 export default function Song({ song_id }: { song_id: string }) {
@@ -19,7 +20,8 @@ export default function Song({ song_id }: { song_id: string }) {
         title: '',
         artist: '',
         album: '',
-        album_id: ''
+        album_id: '',
+        user_rating: 0
     })
 
     const { songID, isPlaying, setSongID, setAlbumID, setIsPlaying } = usePlayerContext()
@@ -31,7 +33,8 @@ export default function Song({ song_id }: { song_id: string }) {
                 title: res.data.data.title,
                 artist: res.data.data.artist.name,
                 album: res.data.data.album.title,
-                album_id: res.data.data.album.id
+                album_id: res.data.data.album.id,
+                user_rating: res.data.data.user_rating
             })
         })
         .catch(() => {

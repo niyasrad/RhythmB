@@ -1,3 +1,4 @@
+import { Heart } from "@styled-icons/heroicons-solid";
 import styled, { keyframes } from "styled-components";
 
 export const BarWrapper = styled.div<{ $mobileMode: boolean }>`
@@ -62,10 +63,18 @@ export const BarImage = styled.img<{ $rotate ?: boolean }>`
     width: 100%;
     height: 100%;
     object-fit: cover;
+    user-select: none;
 
     animation: ${props => props.$rotate ? ImageRotation : "none"} 3s linear infinite;
     transition: all 3s ease-in-out;
 `
+
+export const RatingHeart = styled(Heart)<{ $rating: number }>`
+    animation: ${props => props.$rating === 0 ? "none" : HeartBeat} linear infinite;
+    animation-duration: ${props => props.$rating === 0 ? "0s" : `${3 / props.$rating}s`};
+    transition: all 0.1s ease-in-out;
+`
+
 
 export const ImageRotation = keyframes`
     from {
@@ -74,5 +83,19 @@ export const ImageRotation = keyframes`
 
     to {
         transform: rotate(360deg);
+    }
+`
+
+export const HeartBeat = keyframes`
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
     }
 `

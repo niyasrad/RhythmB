@@ -68,7 +68,11 @@ async def sign_up(user: UserSchema, db: Session = Depends(get_db)):
         access_token = create_access_token(data={"username": new_user.username})
         return {
             "message": "User Created Successfully!",
-            "data": {"token": access_token, "username": new_user.username},
+            "data": {
+                "token": access_token,
+                "username": new_user.username,
+                "user_id": new_user.id,
+            },
         }
     except Exception as e:
         raise handle_exception(e)
@@ -93,7 +97,11 @@ async def sign_in(user: UserOptSchema, db: Session = Depends(get_db)):
 
     return {
         "message": "User Logged In Successfully!",
-        "data": {"token": access_token, "username": user_find.username},
+        "data": {
+            "token": access_token,
+            "username": user_find.username,
+            "user_id": user_find.id,
+        },
     }
 
 

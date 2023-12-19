@@ -13,7 +13,6 @@ from core.utils.errors import (
     handle_exception,
     not_found_error,
     conflict_error,
-    unauthorized_error,
 )
 from core.utils.middlewares import authenticate_common
 
@@ -47,9 +46,6 @@ async def create_rating(
     if find_rating:
         raise conflict_error("rating")
 
-    if user.id != rating.user_id and user.role != UserRole.ADMIN:
-        raise unauthorized_error()
-
     new_rating = Rating(rating=rating.rating, user_id=user.id, song_id=rating.song_id)
     rated_song = db.query(Song).filter(Song.id == new_rating.song_id).first()
 
@@ -78,13 +74,12 @@ async def create_rating(
 
 
 @router.put(
-    "/{rating_id}",
+    "/update",
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
 async def update_rating(
     request: Request,
-    rating_id: str,
     rating: RatingSchema,
     db: Session = Depends(get_db),
 ):
@@ -94,7 +89,12 @@ async def update_rating(
 
     user = request.state.user
 
-    find_rating = db.query(Rating).filter(Rating.id == rating_id).first()
+    find_rating = (
+        db.query(Rating)
+        .filter(Rating.user_id == user.id)
+        .filter(Rating.song_id == rating.song_id)
+        .first()
+    )
 
     if not find_rating:
         raise not_found_error("Rating")
@@ -122,12 +122,12 @@ async def update_rating(
 
 
 @router.delete(
-    "/{rating_id}",
+    "/delete",
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
 async def delete_rating(
-    request: Request, rating_id: str, db: Session = Depends(get_db)
+    request: Request, rating: RatingSchema, db: Session = Depends(get_db)
 ):
     """
     Deletes the rating with the given id.
@@ -135,7 +135,12 @@ async def delete_rating(
 
     user = request.state.user
 
-    find_rating = db.query(Rating).filter(Rating.id == rating_id).first()
+    find_rating = (
+        db.query(Rating)
+        .filter(Rating.user_id == user.id)
+        .filter(Rating.song_id == rating.song_id)
+        .first()
+    )
 
     if not find_rating:
         raise not_found_error("Rating")

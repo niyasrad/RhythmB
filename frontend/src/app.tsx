@@ -15,12 +15,14 @@ const Search = lazy(() => import("./containers/search/search"));
 function AppWrapper({ children }: { children: React.ReactNode }) {
 
   const [username, setUsername] = useState<string>(defaultGlobalContextValue.username)
+  const [userID, setUserID] = useState<string>(defaultGlobalContextValue.userID)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(defaultGlobalContextValue.isLoggedIn)
   const [isLoading, setIsLoading] = useState<boolean>(defaultGlobalContextValue.isLoading)
 
-  const handleLogIn = (token: string, username: string) => {
+  const handleLogIn = (token: string, username: string, user_id: string) => {
     localStorage.setItem("token", token)
     setUsername(username)
+    setUserID(user_id)
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
     setIsLoggedIn(true)
   }
@@ -46,6 +48,7 @@ function AppWrapper({ children }: { children: React.ReactNode }) {
     .then((res) => {
       const response = res.data
       setUsername(response.data.username)
+      setUserID(response.data.id)
       setIsLoggedIn(true)
     })
     .catch(() => {
@@ -61,9 +64,11 @@ function AppWrapper({ children }: { children: React.ReactNode }) {
   return (
     <GlobalContext.Provider value={{
       username,
+      userID,
       isLoggedIn,
       isLoading,
       setUsername,
+      setUserID,
       setIsLoggedIn,
       setIsLoading,
       handleLogIn,

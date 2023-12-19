@@ -97,8 +97,8 @@ async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)
             "ratings": {
                 "total": num_ratings,
                 "avg": average_rating,
-                "user": user_rating.rating if user_rating else 0,
             },
+            "user_rating": user_rating.rating if user_rating else 0,
         },
     }
 

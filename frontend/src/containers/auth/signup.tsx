@@ -59,7 +59,7 @@ export default function SignUp() {
             const res = await axios.post(import.meta.env.VITE_BASE_API + '/user/sign-up', form)
             const response = res.data
 
-            handleLogIn!(response.data.token, response.data.username)
+            handleLogIn!(response.data.token, response.data.username, response.data.user_id)
             navigate('/')
             toast.success("Account Created Successfully!")
 
