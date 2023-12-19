@@ -14,7 +14,7 @@ export interface SongType {
         tags: string[]
     }
 }
-  
+
 export interface AlbumType {
     _index: 'albums',
     _id: string,
@@ -26,7 +26,7 @@ export interface AlbumType {
       tags: string[]
     }
 }
-  
+
 export interface ArtistType {
     _index: 'artists',
     _id: string,
@@ -38,7 +38,7 @@ export interface ArtistType {
       tags: string[]
     }
 }
-  
+
 export type SearchData = SongType | ArtistType | ArtistType
 
 export interface SearchResults {

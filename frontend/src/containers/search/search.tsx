@@ -3,9 +3,9 @@ import { SearchBar, SearchInput, SearchResultContainer, SearchResultWrapper, Sea
 import { MagnifyingGlass } from "@styled-icons/heroicons-solid";
 import axios from "axios";
 import { AlbumType, ArtistType, SearchResults, SongType } from "./search.data";
-import Song from "../../components/song/song";
 import { HeaderTextHigh } from "../../components/index.styles";
 import AlbumWrap from "../../components/albumwrap/albumwrap";
+import SongCarousel from "../../components/songcarousel/songcarousel";
 
 export default function Search() {
 
@@ -26,7 +26,7 @@ export default function Search() {
         let debounceTimeout: number | undefined
 
         const getSearchResults = async () => {
-            
+
             axios.get(import.meta.env.VITE_BASE_API + '/search/any', {
                 params: {
                     query: searchTerm
@@ -60,15 +60,15 @@ export default function Search() {
         if (inputRef.current) {
           inputRef.current.focus()
         }
-    
+
         const handleKeyDown = (event: KeyboardEvent) => {
           if (inputRef.current && /[a-zA-Z0-9]/.test(event.key)) {
             inputRef.current.focus();
           }
         }
-    
+
         document.addEventListener('keydown', handleKeyDown)
-    
+
         return () => {
           document.removeEventListener('keydown', handleKeyDown)
         }
@@ -107,15 +107,15 @@ export default function Search() {
     return (
         <SearchWrapper>
             <SearchBar>
-                <SearchInput 
-                    type="text" 
+                <SearchInput
+                    type="text"
                     placeholder="Type Something.."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     ref={inputRef}
                 />
-                <MagnifyingGlass 
-                    size="1.5rem" 
+                <MagnifyingGlass
+                    size="1.5rem"
                     color="#fff"
                 />
             </SearchBar>
@@ -123,18 +123,9 @@ export default function Search() {
                 songResults.length > 0 && (
                     <SearchResultWrapper>
                         <HeaderTextHigh>Songs</HeaderTextHigh>
-                        <SearchResultContainer>
-                            {
-                                songResults.map((song) => {
-                                    return (
-                                        <Song 
-                                            key={song['_id']}
-                                            song_id={song['_id']}
-                                        />
-                                    )
-                                })
-                            }
-                        </SearchResultContainer>
+                        <SongCarousel
+                            songIDs={songResults.map((song) => song['_id'])}
+                        />
                     </SearchResultWrapper>
                 )
             }
@@ -148,7 +139,7 @@ export default function Search() {
                             {
                                 albumResults.map((album) => {
                                     return (
-                                        <AlbumWrap 
+                                        <AlbumWrap
                                             key={album['_id']}
                                             album_id={album['_id']}
                                             home={false}

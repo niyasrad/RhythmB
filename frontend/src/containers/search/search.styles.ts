@@ -5,7 +5,7 @@ export const SearchWrapper = styled.div`
     height: 90%;
     background-color: var(--secondary-background-color);
 
-    padding: 2.5rem;
+    padding: 1.5rem;
     box-sizing: border-box;
 
     border-radius: 1rem;
@@ -26,7 +26,7 @@ export const SearchWrapper = styled.div`
 
 export const SearchBar = styled.div`
     width: 100%;
-    max-width: 35rem;
+    max-width: 40rem;
     height: auto;
 
     border-radius: 1rem;
@@ -58,24 +58,36 @@ export const SearchInput = styled.input`
 export const SearchResultWrapper = styled.div`
     text-align: center;
     width: 100%;
-    max-width: 40rem;
+    max-width: 50rem;
     height: auto;
 
     display: flex;
     flex-direction: column;
+    align-items: center;
+    background-color: var(--primary-background-color);
     gap: 1rem;
+    padding: 1.5rem;
+    box-sizing: border-box;
+
+    border-radius: 1rem;
+`
+
+export const SongResultContainer = styled.div`
+    height: auto;
+
+    padding: 1.5rem 4rem;
+    box-sizing: border-box;
+
+    border-radius: 1rem;
+
+    background-color: var(--primary-background-color);
+    gap: 3rem;
 `
 
 export const SearchResultContainer = styled.div<{ $huge ?: boolean }>`
     height: auto;
 
-    padding: 3rem;
-    box-sizing: border-box;
-
-    border-radius: 1rem;
-
     display: grid;
     grid-template-columns: ${props => props.$huge ? "repeat(auto-fill, minmax(12rem,1fr))" : "repeat(auto-fill, minmax(9rem,1fr))"};
-    background-color: var(--primary-background-color);
     gap: 3rem;
 `

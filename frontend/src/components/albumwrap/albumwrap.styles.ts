@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const AlbumWrapWrapper = styled.div<{ $home: boolean }>`
     padding: 1.5rem;
     box-sizing: border-box;
-    
+
     width: ${props => props.$home ? '15rem' : 'auto'};
 
     background-color: var(--secondary-background-color);
@@ -32,4 +32,5 @@ export const AlbumWrapImage = styled.img`
     width: 100%;
     height: auto;
     border-radius: 1rem;
+    user-select: none;
 `

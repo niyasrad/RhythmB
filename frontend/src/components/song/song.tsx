@@ -50,8 +50,8 @@ export default function Song({ song_id }: { song_id: string }) {
             <SubTextHigh><span>{songDetails.title}</span></SubTextHigh>
             <SubTextHigh>{songDetails.artist}</SubTextHigh>
             {
-                songID === song_id && isPlaying ? 
-                <SongPause 
+                songID === song_id && isPlaying ?
+                <SongPause
                     size="4rem"
                     onClick={() => {
                         setIsPlaying!(false)
@@ -67,7 +67,7 @@ export default function Song({ song_id }: { song_id: string }) {
                     }}
                 />
             }
-            
+
         </SongWrapper>
     )
 }

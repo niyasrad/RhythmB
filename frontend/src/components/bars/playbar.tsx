@@ -25,12 +25,13 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
 
 
     useEffect(() => {
+        if (!player) return
         if (isPlaying) {
             player.play()
         } else {
             player.pause()
         }
-    }, [isPlaying])
+    }, [isPlaying, player])
 
 
     return(

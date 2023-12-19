@@ -7,7 +7,7 @@ export const CarouselList = styled.div`
     max-width: 40rem;
 
     display: flex;
-    
+
 `
 
 export const CarouselLeft = styled(ArrowLeftCircle)`

@@ -94,9 +94,9 @@ export default function Home() {
             <HeaderTextLow>Welcome, <span>{username}</span></HeaderTextLow>
             <HomeSongs>
                 <DescText>Spice up your {timeOfDay()} with these tracks!</DescText>
-                <SongCarousel 
-                    songIDs={songIDs} 
-                />     
+                <SongCarousel
+                    songIDs={songIDs}
+                />
             </HomeSongs>
             <HomeArtist>
                 <HomeArtistIntro>
