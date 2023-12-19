@@ -5,11 +5,11 @@ import { useNavigate } from "react-router";
 import { useGlobalContext } from "../../contexts/global.context";
 
 import { DescText, HeaderTextHigh, HeaderTextLow } from "../../components/index.styles";
-import { HomeAlbumsList, HomeArtist, HomeArtistIntro, HomeSongs, HomeSongsList, HomeWrapper } from "./home.styles";
+import { HomeAlbumsList, HomeArtist, HomeArtistIntro, HomeSongs, HomeWrapper } from "./home.styles";
 
-import Song from "../../components/song/song";
 import AlbumWrap from "../../components/albumwrap/albumwrap";
 import { ArtistAlbumSearchResult, SongSearchResult } from "../../utils/responses.util";
+import SongCarousel from "../../components/songcarousel/songcarousel";
 
 export default function Home() {
 
@@ -38,7 +38,7 @@ export default function Home() {
             const pickArtist = artists[Math.floor(Math.random() * artists.length)];
             setArtistID(pickArtist._id)
 
-            const pickSongs = songs.sort(() => 0.5 - Math.random()).slice(0, 5);
+            const pickSongs = songs.sort(() => 0.5 - Math.random()).slice(0, 12);
             const songIDs = pickSongs.map((song: SongSearchResult) => song._id);
             setSongIDs(songIDs)
         })
@@ -94,22 +94,14 @@ export default function Home() {
             <HeaderTextLow>Welcome, <span>{username}</span></HeaderTextLow>
             <HomeSongs>
                 <DescText>Spice up your {timeOfDay()} with these tracks!</DescText>
-                <HomeSongsList>
-                {
-                    songIDs.map((songID, index) => (
-                        <Song
-                            key={index}
-                            song_id={songID}
-                        />
-                    ))
-                }
-                </HomeSongsList>
+                <SongCarousel 
+                    songIDs={songIDs} 
+                />     
             </HomeSongs>
             <HomeArtist>
                 <HomeArtistIntro>
                     <DescText>Check out this artist,</DescText>
                     <HeaderTextHigh>{artistName}</HeaderTextHigh>
-                    <DescText>We think you'd <span>love</span> their albums!</DescText>
                 </HomeArtistIntro>
                 <HomeAlbumsList>
                 {

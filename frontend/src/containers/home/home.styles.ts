@@ -6,7 +6,7 @@ export const HomeWrapper = styled.div`
     height: 90%;
     background-color: var(--secondary-background-color);
 
-    padding: 2.5rem;
+    padding: 1.5rem;
     box-sizing: border-box;
 
     border-radius: 1rem;
@@ -14,7 +14,7 @@ export const HomeWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1rem;
 
     overflow-y: auto;
 
@@ -33,29 +33,15 @@ export const HomeSongs = styled.div`
 
     border-radius: 1rem;
 
-    padding: 2.5rem;
-    padding-bottom: 5rem;
+    padding: 1.5rem;
     box-sizing: border-box;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
 
-    @media only screen and (max-width: 990px) {
-        padding: 1.5rem;
-    }
-`
-
-export const HomeSongsList = styled.div`
-    width: 100%;
-    max-width: 40rem;
-    height: auto;
-
-    display: grid;
-    
-    gap: 3rem;
-    grid-template-columns: repeat(auto-fill, minmax(10rem,1fr));
+    text-align: center;
 `
 
 
@@ -67,15 +53,15 @@ export const HomeArtist = styled.div`
 
     border-radius: 1rem;
 
-    padding: 2.5rem;
-    padding-bottom: 5rem;
+    padding: 1.5rem;
     box-sizing: border-box;
 
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 1rem;
 
     @media only screen and (max-width: 990px) {
         padding: 1.5rem;
@@ -83,14 +69,14 @@ export const HomeArtist = styled.div`
 `
 
 export const HomeArtistIntro = styled.div`
-    max-width: 13rem;
+    max-width: 20rem;
     height: auto;
     text-align: center;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
 
     @media only screen and (max-width: 768px) {
         width: 100%;

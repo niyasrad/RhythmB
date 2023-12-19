@@ -23,6 +23,16 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
         }
     }, [songID])
 
+
+    useEffect(() => {
+        if (isPlaying) {
+            player.play()
+        } else {
+            player.pause()
+        }
+    }, [isPlaying])
+
+
     return(
         <BarWrapper
             $mobileMode={mobileMode ? true: false}
@@ -65,11 +75,9 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
                 onClick={
                     () => {
                         if (isPlaying) {
-                            player.pause()
                             setIsPlaying!(false)
                         } else {
                             if (!songID) return
-                            player.play()
                             setIsPlaying!(true)
                         }
                     }
