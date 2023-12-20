@@ -3,11 +3,17 @@ import styled from "styled-components";
 
 export const CarouselList = styled.div`
     position: relative;
-    width: 100%;
-    max-width: 40rem;
-
+    max-width: 80%;
+    width: 40rem;
     display: flex;
 
+    @media only screen and (max-width: 990px) {
+        max-width: 90%;
+    }
+
+    @media only screen and (max-width: 768px) {
+        max-width: 100%;
+    }
 `
 
 export const CarouselLeft = styled(ArrowLeftCircle)`
