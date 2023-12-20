@@ -3,10 +3,10 @@ import rb_logo from '../../assets/logo/rb.svg'
 
 export default function Loader({ home }: { home?: boolean }) {
     return (
-        <LoaderWrapper 
+        <LoaderWrapper
             $home={home ? home : false}
         >
-            <Loading 
+            <Loading
                 src={rb_logo}
                 alt="logo"
             />

@@ -63,9 +63,9 @@ export default function Ratings() {
             toast.error("Could Not Load Ratings! Please Reload the Page.")
         })
 
-    }, [])
+    }, [isLoading, isLoggedIn])
 
-    if (loading) return <Loader />
+    if (loading) return <Loader home/>
 
     return (
         <RatingsWrapper>
@@ -85,7 +85,7 @@ export default function Ratings() {
                     <RatingsDesc>
                         <ColorHeaderText $color="red">Songs <br></br><span>that reached your heart!</span></ColorHeaderText>
                     </RatingsDesc>
-                    <SongCarousel 
+                    <SongCarousel
                         songIDs={redSongs.map((song: RatedSongType) => song.id)}
                     />
                 </RatingsSpec>
@@ -96,7 +96,7 @@ export default function Ratings() {
                     <RatingsDesc>
                         <ColorHeaderText $color="purple">Songs <br></br><span>you cherish and enjoy</span></ColorHeaderText>
                     </RatingsDesc>
-                    <SongCarousel 
+                    <SongCarousel
                         songIDs={purpleSongs.map((song: RatedSongType) => song.id)}
                     />
                 </RatingsSpec>
@@ -107,7 +107,7 @@ export default function Ratings() {
                     <RatingsDesc>
                         <ColorHeaderText $color="aqua">Songs <br></br><span>you liked and listened!</span></ColorHeaderText>
                     </RatingsDesc>
-                    <SongCarousel 
+                    <SongCarousel
                         songIDs={blueSongs.map((song: RatedSongType) => song.id)}
                     />
                 </RatingsSpec>
