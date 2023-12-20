@@ -30,7 +30,7 @@ export const RatingNoSpec = styled.div`
 
     height: 100%;
     background-color: var(--primary-background-color);
-    
+
     padding: 3rem;
     box-sizing: border-box;
 

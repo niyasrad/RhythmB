@@ -7,6 +7,8 @@ import { GlobalContext, defaultGlobalContextValue } from "./contexts/global.cont
 import axios from "axios";
 import Layout from "./components/layout/layout";
 import Loader from "./components/loader/loader";
+import Playlists from "./containers/playlists/playlists";
+import PlaylistCreate from "./containers/playlistcreate/playlistcreate";
 
 const SignIn = lazy(() => import("./containers/auth/signin"));
 const SignUp = lazy(() => import("./containers/auth/signup"));
@@ -94,6 +96,8 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<Search />} />
               <Route path="/ratings" element={<Ratings />} />
+              <Route path="/playlists" element={<Playlists />} />
+              <Route path="/playlists/create" element={<PlaylistCreate />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </Suspense>

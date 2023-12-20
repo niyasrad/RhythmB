@@ -6,6 +6,8 @@ import { AlbumType, ArtistType, SearchResults, SongType } from "./search.data";
 import { HeaderTextHigh } from "../../components/index.styles";
 import AlbumWrap from "../../components/albumwrap/albumwrap";
 import SongCarousel from "../../components/songcarousel/songcarousel";
+import { useGlobalContext } from "../../contexts/global.context";
+import { useNavigate } from "react-router";
 
 export default function Search() {
 
@@ -16,8 +18,18 @@ export default function Search() {
     const [artistResults, setArtistResults] = useState<Array<ArtistType>>([])
     const [albumResults, setAlbumResults] = useState<Array<AlbumType>>([])
 
+    const { isLoggedIn, isLoading, handleSignOut } = useGlobalContext()
+    const navigate = useNavigate()
+
 
     const inputRef = useRef<HTMLInputElement | null>(null)
+
+    useEffect(() => {
+        if (!isLoggedIn && !isLoading) {
+            handleSignOut!()
+            navigate('/sign-in')
+        }
+    }, [isLoading, isLoggedIn])
 
     useEffect(() => {
 

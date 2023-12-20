@@ -79,6 +79,26 @@ async def get_artist(artist_id: str, db: Session = Depends(get_db)):
 
 
 @router.get(
+    "/get/all",
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_artists(db: Session = Depends(get_db)):
+    """
+    Returns all the artists.
+    """
+
+    find_artists = db.query(Artist).all()
+
+    if not find_artists:
+        raise not_found_error("artists")
+
+    return {
+        "message": "Artists Found!",
+        "data": find_artists,
+    }
+
+
+@router.get(
     "/genre/{genre}",
     status_code=status.HTTP_200_OK,
 )
