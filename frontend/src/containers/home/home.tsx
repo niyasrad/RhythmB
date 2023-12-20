@@ -10,6 +10,7 @@ import { HomeAlbumsList, HomeArtist, HomeArtistIntro, HomeSongs, HomeWrapper } f
 import AlbumWrap from "../../components/albumwrap/albumwrap";
 import { ArtistAlbumSearchResult, SongSearchResult } from "../../utils/responses.util";
 import SongCarousel from "../../components/songcarousel/songcarousel";
+import Loader from "../../components/loader/loader";
 
 export default function Home() {
 
@@ -86,7 +87,7 @@ export default function Home() {
 
     }
 
-    if (loading) return null
+    if (loading) return <Loader home/>
 
 
     return (

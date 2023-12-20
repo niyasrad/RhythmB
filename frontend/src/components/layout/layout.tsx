@@ -16,6 +16,10 @@ export default function Layout({ children }: { children: React.ReactNode }){
     const [rating, setRating] = useState<number>(0)
     const [albumID, setAlbumID] = useState<string>('')
 
+    const handlePlaybackEnd = () => {
+        setIsPlaying(false)
+    }
+
 
     if (pathname === "/sign-in" || pathname === "/sign-up") {
         return (
@@ -52,6 +56,7 @@ export default function Layout({ children }: { children: React.ReactNode }){
                     src={songID ? import.meta.env.VITE_BASE_API + `/cdn_asset/songs/${songID}.mp3` : ""}
                     loop={loop}
                     muted={muted}
+                    onEnded={handlePlaybackEnd}
                 />
                 <NavBar mobileMode />
             </LayoutWrapper>

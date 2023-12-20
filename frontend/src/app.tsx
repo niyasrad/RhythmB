@@ -6,21 +6,25 @@ import 'react-toastify/dist/ReactToastify.css';
 import { GlobalContext, defaultGlobalContextValue } from "./contexts/global.context";
 import axios from "axios";
 import Layout from "./components/layout/layout";
+import Loader from "./components/loader/loader";
 
 const SignIn = lazy(() => import("./containers/auth/signin"));
 const SignUp = lazy(() => import("./containers/auth/signup"));
 const Home = lazy(() => import("./containers/home/home"));
 const Search = lazy(() => import("./containers/search/search"));
+const Ratings = lazy(() => import("./containers/ratings/ratings"));
 
 function AppWrapper({ children }: { children: React.ReactNode }) {
 
   const [username, setUsername] = useState<string>(defaultGlobalContextValue.username)
+  const [userID, setUserID] = useState<string>(defaultGlobalContextValue.userID)
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(defaultGlobalContextValue.isLoggedIn)
   const [isLoading, setIsLoading] = useState<boolean>(defaultGlobalContextValue.isLoading)
 
-  const handleLogIn = (token: string, username: string) => {
+  const handleLogIn = (token: string, username: string, user_id: string) => {
     localStorage.setItem("token", token)
     setUsername(username)
+    setUserID(user_id)
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
     setIsLoggedIn(true)
   }
@@ -46,6 +50,7 @@ function AppWrapper({ children }: { children: React.ReactNode }) {
     .then((res) => {
       const response = res.data
       setUsername(response.data.username)
+      setUserID(response.data.id)
       setIsLoggedIn(true)
     })
     .catch(() => {
@@ -61,9 +66,11 @@ function AppWrapper({ children }: { children: React.ReactNode }) {
   return (
     <GlobalContext.Provider value={{
       username,
+      userID,
       isLoggedIn,
       isLoading,
       setUsername,
+      setUserID,
       setIsLoggedIn,
       setIsLoading,
       handleLogIn,
@@ -80,12 +87,13 @@ export default function App() {
     <AppWrapper>
       <BrowserRouter>
         <Layout>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loader home />}>
             <Routes>
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/ratings" element={<Ratings />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </Suspense>

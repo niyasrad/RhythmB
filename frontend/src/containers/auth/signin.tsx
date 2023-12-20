@@ -59,7 +59,7 @@ export default function SignIn() {
             const res = await axios.post(import.meta.env.VITE_BASE_API + '/user/sign-in', form)
             const response = res.data
 
-            handleLogIn!(response.data.token, response.data.username)
+            handleLogIn!(response.data.token, response.data.username, response.data.user_id)
             toast.success("Logged In!")
             navigate('/')
 

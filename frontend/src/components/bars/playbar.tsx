@@ -1,13 +1,22 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
-import { BarWrapper, BarIcon, BarImage } from "./bar.styles";
-import { MusicalNote, SpeakerWave,SpeakerXMark, Play, Pause, ArrowPathRoundedSquare, Heart } from "@styled-icons/heroicons-solid";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+import { BarWrapper, BarIcon, BarImage, RatingHeart } from "./bar.styles";
+import { MusicalNote, SpeakerWave,SpeakerXMark, Play, Pause, ArrowPathRoundedSquare } from "@styled-icons/heroicons-solid";
+
 import { usePlayerContext } from "../../contexts/player.context";
-import { useEffect } from "react";
+import { useGlobalContext } from "../../contexts/global.context";
 
 export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
 
+    const [color, setColor] = useState<string>("grey")
+    const [loading, setLoading] = useState<boolean>(false)
+
     const { pathname } = useLocation()
-    const { setIsPlaying, isPlaying, loop, setLoop, setMuted, muted, songID, albumID } = usePlayerContext()
+    const { userID } = useGlobalContext()
+    const { setIsPlaying, isPlaying, loop, setLoop, setMuted, muted, songID, albumID, rating, setRating } = usePlayerContext()
 
     const player = document.getElementById("rhythmb-audio") as HTMLAudioElement
 
@@ -16,7 +25,96 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
     }
 
     useEffect(() => {
-        if (songID) {
+        if (!songID) return
+        axios.get(import.meta.env.VITE_BASE_API + '/song/' + songID)
+        .then(res => {
+            setRating!(res.data.data.user_rating)
+        })
+        .catch(() => {
+            toast.error("Failed to get song details")
+        })
+    }, [songID])
+
+    useEffect(() => {
+        if (!songID || rating === 0) {
+            setColor("grey")
+            return
+        }
+        if (rating === 1) {
+            setColor("aqua")
+        } else if (rating === 5) {
+            setColor("purple")
+        } else if (rating === 10) {
+            setColor("red")
+        }
+
+    },[songID, rating])
+
+    const giveRating = async () => {
+        if (!songID) return
+        await axios.post(import.meta.env.VITE_BASE_API + '/rating/create', {
+            rating: 1,
+            song_id: songID,
+            user_id: userID
+        })
+        .then(() => {
+            setRating!(1)
+        })
+        .catch(() => {
+            toast.error('Couldn\'t rate song!')
+        })
+    }
+
+    const updateRating = async (ratingNumber: number) => {
+        if (!songID) return
+        await axios.put(import.meta.env.VITE_BASE_API + '/rating/update', {
+            rating: ratingNumber,
+            song_id: songID,
+            user_id: userID
+        })
+        .then(() => {
+            setRating!(ratingNumber)
+        })
+        .catch(() => {
+            toast.error('Couldn\'t update rating!')
+        })
+    }
+
+    const removeRating = async () => {
+        if (!songID) return
+        await axios.delete(import.meta.env.VITE_BASE_API + '/rating/delete/', {
+            data: {
+                rating: 0,
+                song_id: songID,
+                user_id: userID
+            }
+        })
+        .then(() => {
+            setRating!(0)
+        })
+        .catch(() => {
+            toast.error('Couldn\'t remove rating!')
+        })
+    }
+
+
+    const handleRating = async () => {
+        if (!songID || loading) return
+        setLoading(true)
+        if (rating === 0) {
+            await giveRating()
+        } else if (rating === 1) {
+            await updateRating(5)
+        } else if (rating === 5) {
+            await updateRating(10)
+        } else if (rating === 10) {
+            await removeRating()
+        }
+        setLoading(false)
+    }
+
+    useEffect(() => {
+        if (songID && player) {
             player.load()
             player.play()
             setIsPlaying!(true)
@@ -108,9 +206,11 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
                 />
             </BarIcon>
             <BarIcon
-                $color="purple"
+                $color={color}
+                onClick={handleRating}
             >
-                <Heart
+                <RatingHeart
+                    $rating={rating}
                     size={"2rem"}
                 />
             </BarIcon>
