@@ -33,16 +33,12 @@ export default function Search() {
 
     useEffect(() => {
 
-        setSearchResult(null)
-
         let debounceTimeout: number | undefined
 
         const getSearchResults = async () => {
 
-            axios.get(import.meta.env.VITE_BASE_API + '/search/any', {
-                params: {
-                    query: searchTerm
-                }
+            axios.post(import.meta.env.VITE_BASE_API + '/search/any', {
+                query: searchTerm
             })
             .then((res) => {
                 setSearchResult(res.data)

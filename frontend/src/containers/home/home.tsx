@@ -33,7 +33,7 @@ export default function Home() {
             return
         }
 
-        axios.get(import.meta.env.VITE_BASE_API + '/search/recommendation')
+        axios.post(import.meta.env.VITE_BASE_API + '/search/recommendation')
         .then(res => {
             const { artists, songs } = res.data.data
             const pickArtist = artists[Math.floor(Math.random() * artists.length)];

@@ -13,6 +13,8 @@ RhythmB is a music streaming service that allows users to listen to their favori
 - [Backing up PostgreSQL](#backing-up-postgresql)
 - [Elasticsearch & Kibana](#elasticsearch)
 - [Backing up Elasticsearch](#backing-up-elasticsearch)
+- [Screenshots](#screenshots)
+- [About Dataset](#more-about-the-dataset)
 
 
 ## Tech Stack, Tools and Libraries
@@ -29,6 +31,7 @@ RhythmB is a music streaming service that allows users to listen to their favori
 - [Pre-Commit](https://pre-commit.com/)
 - [Black](https://black.readthedocs.io/en/stable/)
 - [Flake8](https://flake8.pycqa.org/en/latest/)
+- [Last FM API](https://www.last.fm/api)
 
 ### Frontend
 
@@ -58,7 +61,7 @@ We're using PostgreSQL for the database.
 We're using SQLAlchemy as the ORM, and we're using the declarative approach. The relationships are defined using the `relationship` function, and are used to create the foreign key constraints. This allows for cascading deletes and updates.
 
 
-![Alt text](<./docs_assets/Database ER diagram (crow's foot).jpeg>)
+![Alt text](<./docs_assets/db_entities.jpeg>)
 
 ### Note
 
@@ -132,33 +135,33 @@ song_mapping = {
 ## API Documentation
 
 You can use the Swagger UI to test the API. It is available at `http://localhost:8080/docs`.
-Additionally, check the [API Postman Documentation](/docs_assets/RhythmB.postman_collection.json) with examples, and sample requests.
+Additionally, check the [API Postman Documentation](/docs_assets/postman.json) with examples, and sample requests.
 
 
 ## Setup
 
 To set the project up locally, we'll be using venvs.
 
-**Create a virtual environment**
+- Create a virtual environment
 
 ```bash
 pip install virtualenv
 virtualenv venv
 ```
 
-**Activate the virtual environment**
+- Activate the virtual environment
 
 ```bash
 .\venv\Scripts\activate
 ```
 
-**Install the dependencies**
+- Install the dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**Run the project**
+- Run the project
 
 ```bash
 uvicorn app:app --reload --port 8080
@@ -167,87 +170,47 @@ uvicorn app:app --reload --port 8080
 
 ## Backing up PostgreSQL
 
-### Introduction
-This document provides instructions on how to back up a PostgreSQL database using the `pg_dump` command.
-
-### Prerequisites
-Make sure you have the PostgreSQL `bin` directory in your system's PATH or provide the full path to the `pg_dump` executable.
-
 ### Backup Steps
 
-**Navigate to PostgreSQL `bin` directory**
-
-Open a Command Prompt and navigate to the PostgreSQL `bin` directory. Replace `16` with your PostgreSQL version.
-
+- Open a Command Prompt and navigate to the PostgreSQL `bin` directory. Replace `16` with your PostgreSQL version.
 ```bash
 cd "C:\Program Files\PostgreSQL\16\bin"
 ```
-
-**Run the pg_dump command**
-
-Replace `postgres`, `rhythmb`, and the output file path accordingly.
+- Replace `postgres`, `rhythmb`, and the output file path accordingly.
 
 ```bash
 pg_dump -U postgres -d rhythmb > "C:\Users\Niyas Hameed\Desktop\rhythmb.sql"
 ```
-Enter your PostgreSQL password when prompted.
-
-**Verify the backup**
-
-Open the output file in a text editor and verify that it contains the database schema and data.
+- Enter your PostgreSQL password when prompted.
+- Open the output file in a text editor and verify that it contains the database schema and data.
 
 ### Restore Steps
 
-**Navigate to PostgreSQL `bin` directory**
-
-Open a Command Prompt and navigate to the PostgreSQL `bin` directory. Replace `16` with your PostgreSQL version.
-
+- Open a Command Prompt and navigate to the PostgreSQL `bin` directory. Replace `16` with your PostgreSQL version.
 ```bash
 cd "C:\Program Files\PostgreSQL\16\bin"
 ```
-
-**Run the psql command**
-
-Replace `postgres`, `rhythmb`, and the input file path accordingly.
+- Replace `postgres`, `rhythmb`, and the input file path accordingly.
 
 ```bash
 psql -U postgres -d rhythmb < "C:\Users\Niyas Hameed\Desktop\rhythmb.sql"
 ```
 
-Enter your PostgreSQL password when prompted.
-
-### Conclusion
-You have successfully backed up your PostgreSQL database using `pg_dump`. Store the backup file in a secure location.
+- Enter your PostgreSQL password when prompted.
 
 
-## Elasticsearch
+### Elasticsearch Installation Steps
 
-### Introduction
-
-This document provides instructions on how to set up Elasticsearch on Windows.
-
-### Installation Steps
-
-**Download Elasticsearch**
-
-Download the Elasticsearch zip file from [here](https://www.elastic.co/downloads/elasticsearch).
-
-**Extract the zip file**
-
-Extract the zip file to a location of your choice.
-
-**Run Elasticsearch**
-
-Navigate to the Elasticsearch bin directory and run the `elasticsearch.bat` file.
+- Download the Elasticsearch zip file from [here](https://www.elastic.co/downloads/elasticsearch).
+- Extract the zip file to a location of your choice.
+- Navigate to the Elasticsearch bin directory and run the `elasticsearch.bat` file.
 
 ```bash
 cd "C:\Users\Niyas Hameed\Desktop\elasticsearch-7.12.1\bin"
 elasticsearch.bat
 ```
 
-**Verify the installation**
-
-Open a browser and navigate to `http://localhost:9200/`. You should see a json response
+- Open a browser and navigate to `http://localhost:9200/`. You should see a json response
 
 ```json
 {
@@ -269,47 +232,19 @@ Open a browser and navigate to `http://localhost:9200/`. You should see a json r
 }
 ```
 
-### Conclusion
 
-You have successfully installed Elasticsearch on your system.
+### Kibana Installation Steps
 
-
-## Kibana
-
-### Introduction
-
-This document provides instructions on how to set up Kibana on Windows.
-
-### Prerequisites
-
-Make sure you have Elasticsearch installed on your system. You can download it from [here](https://www.elastic.co/downloads/elasticsearch).
-
-### Installation Steps
-
-**Download Kibana**
-
-Download the Kibana zip file from [here](https://www.elastic.co/downloads/kibana).
-
-**Extract the zip file**
-
-Extract the zip file to a location of your choice.
-
-**Run Kibana**
-
-Navigate to the Kibana bin directory and run the `kibana.bat` file.
+- Download the Kibana zip file from [here](https://www.elastic.co/downloads/kibana).
+- Extract the zip file to a location of your choice.
+- Navigate to the Kibana bin directory and run the `kibana.bat` file.
 
 ```bash
 cd "C:\Users\Niyas Hameed\Desktop\kibana-7.12.1-windows-x86_64\bin"
 kibana.bat
 ```
 
-**Verify the installation**
-
-Open a browser and navigate to `http://localhost:5601/`. You should see the Kibana home page.
-
-### Conclusion
-
-You have successfully installed Kibana on your system.
+- Open a browser and navigate to `http://localhost:5601/`. You should see the Kibana home page.
 
 ### Note
 
@@ -323,17 +258,7 @@ Make sure that, if you run Elasticsearch locally, you have changed the `elastics
 
 ## Backing up Elasticsearch
 
-### Introduction
-
-This document provides instructions on how to back up an Elasticsearch index using kibana.
-
-### Prerequisites
-
-Make sure you have Elasticsearch and Kibana installed on your system. You can download them from [here](https://www.elastic.co/downloads/).
-
-### Backup Steps
-
-**Set up path.repo**
+- Set up path.repo
 
 Open the elasticsearch.yml file and add the following lines.
 
@@ -341,19 +266,89 @@ Open the elasticsearch.yml file and add the following lines.
 path.repo: "C:/Users/Niyas Hameed/Desktop/backup"
 ```
 
-
-**Create a repository**
-
-Open Kibana and navigate to `Management > Stack Management > Snapshot and Restore > Repositories`.
-
-Click on `Create repository` and enter the details.
-
-**Create a policy**
-
-Click on `Create policy` and enter the details.
-
-**Run the snapshot**
-
-Navigate to `Management > Stack Management > Snapshot and Restore > Snapshots`.
+- Open Kibana and navigate to `Management > Stack Management > Snapshot and Restore > Repositories`.
+- Click on `Create repository` and enter the details.
+- Click on `Create policy` and enter the details.
+- Navigate to `Management > Stack Management > Snapshot and Restore > Snapshots`.
 
 Run the policy, and it will create a snapshot and store it in the repository.
+
+
+## Screenshots
+
+### Home Page
+
+<div class="desktop-screenshots" >
+  <img src="./docs_assets/desktop_ss/home.png" alt="Home Page" />
+</div>
+
+<div class="mobile-screenshots">
+  <img src="./docs_assets/mobile_ss/home.png" alt="Home Page"  />
+</div>
+
+### Search Page
+
+<div class="desktop-screenshots" >
+  <img src="./docs_assets/desktop_ss/search.png" alt="Search Page" />
+</div>
+
+<div class="mobile-screenshots">
+  <img src="./docs_assets/mobile_ss/search.png" alt="Search Page"  />
+</div>
+
+### Playlists Page
+
+<div class="desktop-screenshots" >
+  <img src="./docs_assets/desktop_ss/playlists.png" alt="Playlists Page" />
+</div>
+
+<div class="mobile-screenshots">
+  <img src="./docs_assets/mobile_ss/playlists.png" alt="Playlists Page"  />
+</div>
+
+### Ratings Page
+
+<div class="desktop-screenshots" >
+  <img src="./docs_assets/desktop_ss/ratings.png" alt="Ratings Page" />
+</div>
+
+<div class="mobile-screenshots">
+  <img src="./docs_assets/mobile_ss/ratings.png" alt="Ratings Page"  />
+</div>
+
+
+<style>
+  .mobile-screenshots {
+    display: none;
+  }
+
+  @media (max-width: 690px) {
+    .desktop-screenshots {
+      display: none;
+    }
+    .mobile-screenshots {
+      display: block;
+    }
+  }
+</style>
+
+
+## More about the dataset
+
+The dataset was manually curated by @niyasrad, which contains over
+
+- 172 Songs
+- 41 Albums
+- 14 Artists
+- 4 Main Genres
+
+The data is populated via the `/populate` route, which takes in a CSV of all the song meta data - Title, Aritst, Album, Genre, Length. The CSV is parsed, and the data is inserted into the database. The `tags` field is populated for `songs`, `albums`, and `artists`. The `tags` field is a list of strings, and is used for searching.
+
+
+MP3 Files, are directly downloaded over from YouTube using `FFMpeg`, and at the worst possible quality, download and audio conversion for 172 songs takes roughly, 90 minutes.
+
+Album Artwork, and song tags are taken via the `Last FM API`. All of the MP3, and all of the album artwork is stored as a static file over `cdn_assets/` folder in the backend, and is accessible easily for the front-end.
+
+![Alt text](frontend/src/assets/logo/rb.svg)
+
+## Thank you! You can check out my other projects!
