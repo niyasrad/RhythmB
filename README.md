@@ -1,4 +1,139 @@
-## Welcome to the RhythmB Docs
+## Welcome to the RhythmB Docs!
+
+![Alt text](frontend/src/assets/logo/rhythmb.svg)
+
+RhythmB is a music streaming service that allows users to listen to their favorite songs and discover new music. It is built using Python, FastAPI, PostgreSQL, Elasticsearch, and Kibana for the backend and React and Typescript for the frontend.
+
+## Contents
+
+- [Tech Stack, Tools and Libraries](#tech-stack-tools-and-libraries)
+- [DB, Index and Design](#db-index-and-design)
+- [API Documentation](#api-documentation)
+- [Setup & Environment](#setup)
+- [Backing up PostgreSQL](#backing-up-postgresql)
+- [Elasticsearch & Kibana](#elasticsearch)
+- [Backing up Elasticsearch](#backing-up-elasticsearch)
+
+
+## Tech Stack, Tools and Libraries
+
+### Backend
+
+- [Python](https://www.python.org/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [Elasticsearch](https://www.elastic.co/)
+- [Kibana](https://www.elastic.co/)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [Pydantic](https://pydantic-docs.helpmanual.io/)
+- [Pre-Commit](https://pre-commit.com/)
+- [Black](https://black.readthedocs.io/en/stable/)
+- [Flake8](https://flake8.pycqa.org/en/latest/)
+
+### Frontend
+
+- [React](https://reactjs.org/)
+- [Typescript](https://www.typescriptlang.org/)
+- [Styled Components](https://styled-components.com/)
+- [React Router](https://reactrouter.com/)
+- [React Icons](https://react-icons.github.io/react-icons/)
+- [React Toastify](https://fkhadra.github.io/react-toastify/introduction)
+
+### Others
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Postman](https://www.postman.com/)
+- [Git](https://git-scm.com/)
+- [Vercel](https://vercel.com/)
+- [Render](https://render.com/)
+
+## DB, Index and Design
+
+### Database
+
+We're using PostgreSQL for the database.
+
+### ORM - SQLAlchemy
+
+We're using SQLAlchemy as the ORM, and we're using the declarative approach. The relationships are defined using the `relationship` function, and are used to create the foreign key constraints. This allows for cascading deletes and updates.
+
+
+![Alt text](<./docs_assets/Database ER diagram (crow's foot).jpeg>)
+
+### Note
+
+- If an `Artist` is deleted, all the `Albums` and `Songs` associated with the `Artist` are deleted.
+- If an `Album` is deleted, all the `Songs` associated with the `Album` are deleted.
+- If a `Song` is deleted, all the `Ratings` associated with the `Song` are deleted, and the `Song` is removed from all the `Playlists` it is associated with.
+
+### Song Schema (Example)
+
+```python
+class Song(Base):
+    __tablename__ = "songs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    title = Column(String, index=True)
+    artist_id = Column(
+        UUID(as_uuid=True), ForeignKey("artists.id", ondelete="CASCADE"), index=True
+    )
+    album_id = Column(
+        UUID(as_uuid=True), ForeignKey("albums.id", ondelete="CASCADE"), index=True
+    )
+    genre = Column(String, index=True)
+    length = Column(Integer, index=True)
+
+    artist = relationship("Artist", back_populates="songs")
+    playlist = relationship(
+        "Playlist", secondary=songs_playlists_association, back_populates="songs"
+    )
+    album = relationship("Album", back_populates="songs")
+    ratings = relationship("Rating", back_populates="song", cascade="all, delete")
+
+    def __repr__(self):
+        return (
+            f"<Song {self.title} {self.artist} {self.album} {self.genre} {self.length}>"
+        )
+```
+
+### Search Index
+
+We're using Elasticsearch for the search index. It is set up locally.
+
+### Index Mapping
+
+We have defined the index mapping in the `search.py` file. The difference between Postgres data, and Elasticsearch data is the storing of the `tags` field. The `tags` field is a list of strings, and is used for searching.
+
+### Song Index Mapping (Example)
+
+```python
+song_mapping = {
+        "mappings": {
+            "properties": {
+                "id": {"type": "keyword"},
+                "title": {"type": "text"},
+                "artist_id": {"type": "keyword"},
+                "album_id": {"type": "keyword"},
+                "artist_name": {"type": "text"},
+                "album_title": {"type": "text"},
+                "genre": {"type": "keyword"},
+                "length": {"type": "integer"},
+                "tags": {"type": "keyword"},
+            }
+        }
+    }
+```
+
+### Note
+
+- The `tags` field is a list of strings, and is used for searching.
+- The `tags` are populated for `songs`, `albums`, and `artists`.
+
+## API Documentation
+
+You can use the Swagger UI to test the API. It is available at `http://localhost:8080/docs`.
+Additionally, check the [API Postman Documentation](/docs_assets/RhythmB.postman_collection.json) with examples, and sample requests.
+
 
 ## Setup
 
@@ -30,7 +165,7 @@ uvicorn app:app --reload --port 8080
 ```
 
 
-## PostgreSQL Database Backup Documentation
+## Backing up PostgreSQL
 
 ### Introduction
 This document provides instructions on how to back up a PostgreSQL database using the `pg_dump` command.

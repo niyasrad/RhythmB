@@ -22,4 +22,4 @@ class Rating(Base):
     song = relationship("Song", back_populates="ratings")
 
     def __repr__(self):
-        return f"<Rating {self.from_user} {self.to_user} {self.rating}>"
+        return f"<Rating {self.user_id}  {self.rating}>"

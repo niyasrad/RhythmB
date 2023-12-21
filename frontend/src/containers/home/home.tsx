@@ -39,7 +39,7 @@ export default function Home() {
             const pickArtist = artists[Math.floor(Math.random() * artists.length)];
             setArtistID(pickArtist._id)
 
-            const pickSongs = songs.sort(() => 0.5 - Math.random()).slice(0, 12);
+            const pickSongs = songs.sort(() => 0.5 - Math.random()).slice(0, 20);
             const songIDs = pickSongs.map((song: SongSearchResult) => song._id);
             setSongIDs(songIDs)
         })

@@ -89,6 +89,14 @@ async def recommendation(request: Request):
 
     like_documents = []
 
+    ratings = user.ratings
+    if len(ratings) > 2:
+        ratings.sort(key=lambda x: x.rating, reverse=True)
+    ratings = ratings[:3]
+
+    for rating in ratings:
+        like_documents.append({"_index": "songs", "_id": rating.song_id})
+
     for artist_id in user.interests:
         like_documents.append({"_index": "artists", "_id": artist_id})
 
