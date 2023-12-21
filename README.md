@@ -316,23 +316,6 @@ Run the policy, and it will create a snapshot and store it in the repository.
   <img src="./docs_assets/mobile_ss/ratings.png" alt="Ratings Page"  />
 </div>
 
-
-<style>
-  .mobile-screenshots {
-    display: none;
-  }
-
-  @media (max-width: 690px) {
-    .desktop-screenshots {
-      display: none;
-    }
-    .mobile-screenshots {
-      display: block;
-    }
-  }
-</style>
-
-
 ## More about the dataset
 
 The dataset was manually curated by @niyasrad, which contains over
