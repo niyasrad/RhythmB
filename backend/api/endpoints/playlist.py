@@ -74,12 +74,12 @@ async def create_playlist_conditional(
 
     search_query = {"query": {"bool": {"must": []}}}
 
-    if playlist.genre and playlist.artists:
+    if playlist.genres and playlist.artists:
         combined_query = {
             "bool": {
                 "must": [
                     {"terms": {"artist_id": playlist.artists}},
-                    {"terms": {"genre": playlist.genre}},
+                    {"terms": {"genre": playlist.genres}},
                 ]
             }
         }
@@ -93,7 +93,7 @@ async def create_playlist_conditional(
 
             search_query["query"]["bool"]["must"] = []
             search_query["query"]["bool"]["must"].append(
-                {"terms": {"genre": playlist.genre}}
+                {"terms": {"genre": playlist.genres}}
             )
             results_genre = es.search(index="songs", body=search_query)
             genres_hits = results_genre.get("hits", {}).get("hits", [])
@@ -108,9 +108,9 @@ async def create_playlist_conditional(
             hits.extend(artist_hits)
 
     else:
-        if playlist.genre:
+        if playlist.genres:
             search_query["query"]["bool"]["must"].append(
-                {"terms": {"genre": playlist.genre}}
+                {"terms": {"genre": playlist.genres}}
             )
         elif playlist.artists:
             search_query["query"]["bool"]["must"].append(

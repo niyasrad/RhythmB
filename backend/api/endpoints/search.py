@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 from core.utils.search import es
+
+from core.schemas.search import SearchQuery
 from core.utils.dependencies import get_db
 
 from core.utils.middlewares import authenticate_common
@@ -12,13 +14,15 @@ router = APIRouter(
 )
 
 
-@router.get(
+@router.post(
     "/any", dependencies=[Depends(authenticate_common)], status_code=status.HTTP_200_OK
 )
-async def search(query: str):
+async def search(search_query: SearchQuery):
     """
     Searches for a query in the database.
     """
+
+    query = search_query.query
 
     search_query = {
         "query": {
@@ -75,7 +79,7 @@ async def filter_songs(attribute: str, query: str, db: Session = Depends(get_db)
         raise e
 
 
-@router.get(
+@router.post(
     "/recommendation",
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
