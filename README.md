@@ -334,4 +334,80 @@ Album Artwork, and song tags are taken via the `Last FM API`. All of the MP3, an
 
 ![Alt text](frontend/src/assets/logo/rb.svg)
 
+## K8s Deployment & Services
+
+First, we'll need a certificate (.PEM format) to bypass the `https` error.
+Once minikube is installed,
+
+```bash
+minikube start
+```
+
+If you're using Windows, This is to use the docker daemon inside minikube. Else, use `eval $(minikube docker-env)` for Linux.
+
+```bash
+$(minikube docker-env)
+```
+
+To activate the minikube docker daemon in powershell, use the following command,
+
+```bash
+& minikube -p minikube docker-env --shell powershell | Invoke-Expression
+```
+
+To access the minikube dashboard,
+
+```bash
+minikube dashboard
+```
+
+### Postgres K8
+
+Create a Dockerfile, sample given here,
+```bash
+FROM postgres:latest
+
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=user
+ENV POSTGRES_DB=rhythmb
+
+COPY ./rhythmb.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5432
+```
+
+Build the image,
+```bash
+docker build -t rhythmb-postgres .
+```
+
+Create a deployment, service refer to the `k8.yaml` in the repo for sample.
+
+### Note
+
+- You can use imagePullPolicy: Never, if you're using a local image.
+- You can use imagePullPolicy: Always, if you're using a remote image.
+
+Once done, apply the yaml file,
+
+```bash
+kubectl apply -f k8.yaml
+```
+
+This will create a deployment, and a service for the postgres instance. Check the status of these using,
+
+```bash
+kubectl get deployments
+kubectl get services
+kubectl get pods
+```
+
+If you have any issues, you can check the logs using,
+
+```bash
+kubectl describe pods
+```
+
+
+
 ## Thank you! You can check out my other projects!
