@@ -274,48 +274,6 @@ path.repo: "C:/Users/Niyas Hameed/Desktop/backup"
 Run the policy, and it will create a snapshot and store it in the repository.
 
 
-## Screenshots
-
-### Home Page
-
-<div class="desktop-screenshots" >
-  <img src="./docs_assets/desktop_ss/home.png" alt="Home Page" />
-</div>
-
-<div class="mobile-screenshots">
-  <img src="./docs_assets/mobile_ss/home.png" alt="Home Page"  />
-</div>
-
-### Search Page
-
-<div class="desktop-screenshots" >
-  <img src="./docs_assets/desktop_ss/search.png" alt="Search Page" />
-</div>
-
-<div class="mobile-screenshots">
-  <img src="./docs_assets/mobile_ss/search.png" alt="Search Page"  />
-</div>
-
-### Playlists Page
-
-<div class="desktop-screenshots" >
-  <img src="./docs_assets/desktop_ss/playlists.png" alt="Playlists Page" />
-</div>
-
-<div class="mobile-screenshots">
-  <img src="./docs_assets/mobile_ss/playlists.png" alt="Playlists Page"  />
-</div>
-
-### Ratings Page
-
-<div class="desktop-screenshots" >
-  <img src="./docs_assets/desktop_ss/ratings.png" alt="Ratings Page" />
-</div>
-
-<div class="mobile-screenshots">
-  <img src="./docs_assets/mobile_ss/ratings.png" alt="Ratings Page"  />
-</div>
-
 ## More about the dataset
 
 The dataset was manually curated by @niyasrad, which contains over
@@ -363,13 +321,16 @@ minikube dashboard
 
 ### Postgres K8
 
-Create a Dockerfile, sample given here,
-```bash
+Create a Dockerfile, sample given here with the back-up script
+```
 FROM postgres:latest
 
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=user
 ENV POSTGRES_DB=rhythmb
+
+ENV PGDATA=/var/tmp/hostpath-provisioner/postgresql/data
+RUN mkdir -p $PGDATA && chown -R postgres:postgres $PGDATA
 
 COPY ./rhythmb.sql /docker-entrypoint-initdb.d/
 
@@ -381,12 +342,33 @@ Build the image,
 docker build -t rhythmb-postgres .
 ```
 
-Create a deployment, service refer to the `k8.yaml` in the repo for sample.
+Create a deployment, service refer to the `k8.yaml` in the repo for sample. This is an example for the Persistent Volume,
+
+```yml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  labels:
+    type: local
+    app: postgres
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /var/tmp/hostpath-provisioner/postgresql/data
+```
 
 ### Note
 
 - You can use imagePullPolicy: Never, if you're using a local image.
 - You can use imagePullPolicy: Always, if you're using a remote image.
+- Also write the `PVC`, `PV` for the postgres instance. Refer to the `k8.yaml` in the repo for sample.
 
 Once done, apply the yaml file,
 
@@ -400,6 +382,8 @@ This will create a deployment, and a service for the postgres instance. Check th
 kubectl get deployments
 kubectl get services
 kubectl get pods
+kubectl get pvc
+kubectl get pv
 ```
 
 If you have any issues, you can check the logs using,
