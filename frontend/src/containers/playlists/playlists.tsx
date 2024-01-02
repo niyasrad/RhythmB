@@ -31,7 +31,7 @@ export default function Playlists() {
 
     useEffect(() => {
 
-        axios.get(import.meta.env.VITE_BASE_API + '/user/profile')
+        axios.get('/api/user/profile')
         .then((res) => {
             const response = res.data
             setUserPlaylists(response.data.playlists)

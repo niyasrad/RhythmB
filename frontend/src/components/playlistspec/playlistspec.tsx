@@ -23,7 +23,7 @@ export default function PlaylistSpec({ playlist_id }: { playlist_id: string }) {
     const [playlistDeleted, setPlaylistDeleted] = useState<boolean>(false)
 
     useEffect(() => {
-        axios.get(import.meta.env.VITE_BASE_API + '/playlist/' + playlist_id)
+        axios.get('/api/playlist/' + playlist_id)
         .then((res) => {
             const response = res.data
             setPlaylistSongs(response.data.songs)
@@ -36,7 +36,7 @@ export default function PlaylistSpec({ playlist_id }: { playlist_id: string }) {
     }, [])
 
     const handleDeletePlaylist = () => {
-        axios.delete(import.meta.env.VITE_BASE_API + '/playlist/' + playlist_id)
+        axios.delete('/api/playlist/' + playlist_id)
         .then(() => {
             toast.success("Playlist deleted")
             setPlaylistDeleted(true)

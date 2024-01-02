@@ -20,7 +20,7 @@ export default function AlbumWrap({ album_id, home }: { album_id: string, home: 
     })
 
     useEffect(() => {
-        axios.get(import.meta.env.VITE_BASE_API + `/album/${album_id}`)
+        axios.get(`/api/album/${album_id}`)
         .then(res => {
             setAlbumDetails({
                 title: res.data.data.title,
@@ -38,7 +38,7 @@ export default function AlbumWrap({ album_id, home }: { album_id: string, home: 
     return (
         <AlbumWrapWrapper $home={home}>
             <AlbumWrapImage
-                src={import.meta.env.VITE_BASE_API + "/cdn_asset/albums/" + album_id + '.jpg'}
+                src={"/cdn_asset/albums/" + album_id + '.jpg'}
                 alt="Album Image"
             />
             <SubTextHigh><span>{albumDetails.title}</span></SubTextHigh>

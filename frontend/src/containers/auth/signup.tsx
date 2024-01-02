@@ -56,7 +56,7 @@ export default function SignUp() {
 
         try {
 
-            const res = await axios.post(import.meta.env.VITE_BASE_API + '/user/sign-up', form)
+            const res = await axios.post('/api/user/sign-up', form)
             const response = res.data
 
             handleLogIn!(response.data.token, response.data.username, response.data.user_id)

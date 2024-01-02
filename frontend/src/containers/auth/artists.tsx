@@ -29,7 +29,7 @@ export default function Artists({ handleArtistsChange, genres, handleFormSubmit 
         const fetchData = async () => {
             try {
                 const requests = genres.map(async (genre) => {
-                    const response = await axios.get(import.meta.env.VITE_BASE_API + '/artist/genre/' + genre);
+                    const response = await axios.get('/api/artist/genre/' + genre);
                     return response.data.data || []
                 })
 

@@ -364,11 +364,64 @@ spec:
     path: /var/tmp/hostpath-provisioner/postgresql/data
 ```
 
+## Frontend NGINX K8
+
+Create a Dockerfile, sample given here with the back-up script
+```
+FROM node:21-alpine3.18 as build-stage
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+RUN npm run build
+
+FROM nginx:latest
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build-stage /usr/src/app/dist /usr/share/nginx/html
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+And here, let's focus on the proxy to back-end in `nginx.conf` file,
+
+```conf
+location /api/ {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header content_type "application/json";
+
+        add_header Access-Control-Allow-Origin *;
+        add_header Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE";
+        add_header Access-Control-Allow-Headers "Authorization";
+
+        proxy_set_header Authorization $http_authorization;
+
+        proxy_pass_request_headers on;
+        proxy_http_version 1.1;
+        proxy_request_buffering off;
+        proxy_buffering off;
+
+        rewrite ^/api(/.*)$ $1 break;
+        proxy_pass http://backend-service:8000/;
+    }
+```
+
+The concept here is that, the `nginx` container will be running on port `80`, and the `backend-service` will be running on port `8000`. So, we're proxying the requests from `nginx` to `backend-service`. This ensures that, the browser doesn't throw not found errors, and the requests are proxied to the backend service in K8s without any issues.
+
+This is useful when you're using a single domain, and you want to proxy the requests to the backend service. This is also useful when you're using a single domain, and you want to proxy the requests to the backend service, and you want to use a single domain for both the frontend and the backend.
+
 ### Note
 
 - You can use imagePullPolicy: Never, if you're using a local image.
 - You can use imagePullPolicy: Always, if you're using a remote image.
 - Also write the `PVC`, `PV` for the postgres instance. Refer to the `k8.yaml` in the repo for sample.
+- Do not have multiple replicas for the postgres instance, as it will cause issues with the database, and the storing of data. (Might store different data in different pods, and will cause issues with the database)
+- Instead of port-forwarding, using the proxy with nginx is a better option, as it will ensure that the requests are proxied to the backend service in K8s without any issues in local development, as well as in production.
 
 Once done, apply the yaml file,
 

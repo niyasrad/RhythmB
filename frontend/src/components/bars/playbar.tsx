@@ -26,7 +26,7 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
 
     useEffect(() => {
         if (!songID) return
-        axios.get(import.meta.env.VITE_BASE_API + '/song/' + songID)
+        axios.get('/api/song/' + songID)
         .then(res => {
             setRating!(res.data.data.user_rating)
         })
@@ -52,7 +52,7 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
 
     const giveRating = async () => {
         if (!songID) return
-        await axios.post(import.meta.env.VITE_BASE_API + '/rating/create', {
+        await axios.post('/api/rating/create', {
             rating: 1,
             song_id: songID,
             user_id: userID
@@ -67,7 +67,7 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
 
     const updateRating = async (ratingNumber: number) => {
         if (!songID) return
-        await axios.put(import.meta.env.VITE_BASE_API + '/rating/update', {
+        await axios.put('/api/rating/update', {
             rating: ratingNumber,
             song_id: songID,
             user_id: userID
@@ -82,13 +82,7 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
 
     const removeRating = async () => {
         if (!songID) return
-        await axios.delete(import.meta.env.VITE_BASE_API + '/rating/delete/', {
-            data: {
-                rating: 0,
-                song_id: songID,
-                user_id: userID
-            }
-        })
+        await axios.delete('/api/rating/delete/' + songID)
         .then(() => {
             setRating!(0)
         })
@@ -140,7 +134,7 @@ export default function PlayBar({ mobileMode }: { mobileMode?: boolean }) {
                 {
                     albumID ?
                     <BarImage
-                        src={import.meta.env.VITE_BASE_API + "/cdn_asset/albums/" + albumID + '.jpg'}
+                        src={"/cdn_asset/albums/" + albumID + '.jpg'}
                         $rotate={isPlaying}
                         alt="Song Image"
                     />

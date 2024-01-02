@@ -53,7 +53,7 @@ export default function Layout({ children }: { children: React.ReactNode }){
                 <PlayBar mobileMode />
                 <RhythmbAudio
                     id="rhythmb-audio"
-                    src={songID ? import.meta.env.VITE_BASE_API + `/cdn_asset/songs/${songID}.mp3` : ""}
+                    src={songID ? `/cdn_asset/songs/${songID}.mp3` : ""}
                     loop={loop}
                     muted={muted}
                     onEnded={handlePlaybackEnd}

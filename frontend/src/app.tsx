@@ -48,7 +48,7 @@ function AppWrapper({ children }: { children: React.ReactNode }) {
     }
 
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    axios.get(import.meta.env.VITE_BASE_API + '/user/profile')
+    axios.get('/api/user/profile')
     .then((res) => {
       const response = res.data
       setUsername(response.data.username)
