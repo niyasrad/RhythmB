@@ -45,7 +45,7 @@ export default function Ratings() {
 
         setLoading(true)
 
-        axios.get(import.meta.env.VITE_BASE_API + "/user/get-ratings")
+        axios.get("/api/user/get-ratings")
         .then(res => {
             let response = res.data.data.ratings
 

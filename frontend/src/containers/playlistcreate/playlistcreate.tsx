@@ -53,7 +53,7 @@ export default function PlaylistCreate() {
 
     const handleSubmit = () => {
         if (!checkForm()) return
-        axios.post(import.meta.env.VITE_BASE_API + '/playlist/create/conditional', playlistForm)
+        axios.post('/api/playlist/create/conditional', playlistForm)
         .then(() => {
             toast.success("Playlist created")
             navigate('/playlists')
@@ -77,7 +77,7 @@ export default function PlaylistCreate() {
     }, [isLoading, isLoggedIn, userID])
 
     useEffect(() => {
-        axios.get(import.meta.env.VITE_BASE_API + '/artist/get/all')
+        axios.get('/api/artist/get/all')
         .then((res) => {
             const response = res.data
             setArtists(response.data)

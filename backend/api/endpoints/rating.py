@@ -122,13 +122,11 @@ async def update_rating(
 
 
 @router.delete(
-    "/delete",
+    "/delete/{song_id}",
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_rating(
-    request: Request, rating: RatingSchema, db: Session = Depends(get_db)
-):
+async def delete_rating(request: Request, song_id: str, db: Session = Depends(get_db)):
     """
     Deletes the rating with the given id.
     """
@@ -138,7 +136,7 @@ async def delete_rating(
     find_rating = (
         db.query(Rating)
         .filter(Rating.user_id == user.id)
-        .filter(Rating.song_id == rating.song_id)
+        .filter(Rating.song_id == song_id)
         .first()
     )
 

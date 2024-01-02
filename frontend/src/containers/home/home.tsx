@@ -33,7 +33,7 @@ export default function Home() {
             return
         }
 
-        axios.post(import.meta.env.VITE_BASE_API + '/search/recommendation')
+        axios.post('/api/search/recommendation')
         .then(res => {
             const { artists, songs } = res.data.data
             const pickArtist = artists[Math.floor(Math.random() * artists.length)];
@@ -53,7 +53,7 @@ export default function Home() {
 
     useEffect(() => {
         if (artistID) {
-            axios.get(import.meta.env.VITE_BASE_API + `/artist/${artistID}`)
+            axios.get(`/api/artist/${artistID}`)
             .then(res => {
                 const albums = res.data.data.albums
                 setArtistName(res.data.data.name)

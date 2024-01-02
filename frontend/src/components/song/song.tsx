@@ -27,7 +27,7 @@ export default function Song({ song_id }: { song_id: string }) {
     const { songID, isPlaying, setSongID, setAlbumID, setIsPlaying } = usePlayerContext()
 
     useEffect(() => {
-        axios.get(import.meta.env.VITE_BASE_API + '/song/' + song_id)
+        axios.get('/api/song/' + song_id)
         .then(res => {
             setSongDetails({
                 title: res.data.data.title,
@@ -47,7 +47,7 @@ export default function Song({ song_id }: { song_id: string }) {
     return (
         <SongWrapper>
             <SongImage
-                src={import.meta.env.VITE_BASE_API + "/cdn_asset/albums/" + songDetails.album_id + '.jpg'}
+                src={"/cdn_asset/albums/" + songDetails.album_id + '.jpg'}
                 alt="Song Image"
             />
             <SubTextHigh><span>{songDetails.title}</span></SubTextHigh>
