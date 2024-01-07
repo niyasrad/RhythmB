@@ -7,6 +7,8 @@ ENV POSTGRES_DB=rhythmb
 ENV PGDATA=/var/tmp/hostpath-provisioner/postgresql/data
 RUN mkdir -p $PGDATA && chown -R postgres:postgres $PGDATA
 
+RUN rm -rf $PGDATA/*
+
 COPY ./rhythmb.sql /docker-entrypoint-initdb.d/
 
 EXPOSE 5432
