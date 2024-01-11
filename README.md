@@ -415,6 +415,20 @@ The concept here is that, the `nginx` container will be running on port `80`, an
 
 This is useful when you're using a single domain, and you want to proxy the requests to the backend service. This is also useful when you're using a single domain, and you want to proxy the requests to the backend service, and you want to use a single domain for both the frontend and the backend.
 
+## Redis Caching 
+
+The project involves Redis caching. The way it works is, instead of hitting the DB for every single `UUID` query with `GET` endpoint, we'll store the song data, and cache it in Redis, which runs as a k8 depoyment, and is accessed via service. This ensures optimal way of using the Database, and avoids a lot of performance issues.
+
+```
+FROM redis:latest
+COPY redis.conf /usr/local/etc/redis/redis.conf
+EXPOSE 6379
+
+CMD ["redis-server", "/usr/local/etc/redis/redis.conf"]
+```
+
+The Dockerfile for Redis, uses a `.conf` file, which ensures security and other options.
+
 ### Note
 
 - You can use imagePullPolicy: Never, if you're using a local image.
