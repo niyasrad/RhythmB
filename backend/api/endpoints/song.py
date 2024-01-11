@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends, status, Request
 
+import redis
+import json
+
 from sqlalchemy.orm import Session
 from core.utils.search import es
 
@@ -7,9 +10,10 @@ from core.models.rating import Rating
 from core.models.song import Song
 from core.schemas.song import Song as SongSchema
 
-from core.utils.dependencies import get_db
+from core.utils.dependencies import get_db, CustomJSONEncoder
 from core.utils.errors import handle_exception, not_found_error
 from core.utils.middlewares import authenticate_common, authenticate_admin
+from core.utils.redis import redis_manager
 
 router = APIRouter(
     prefix="/song",
@@ -63,7 +67,7 @@ async def create_song(song: SongSchema, db: Session = Depends(get_db)):
     dependencies=[Depends(authenticate_common)],
     status_code=status.HTTP_200_OK,
 )
-async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)):
+async def get_song(request: Request, song_id: str, db: Session = Depends(get_db), redis: redis.StrictRedis = Depends(redis_manager.get_redis_instance)):
     """
     Returns the song with the given id.
     """
@@ -71,6 +75,14 @@ async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)
     user = request.state.user
 
     find_song = db.query(Song).filter(Song.id == song_id).first()
+
+    cached_data = redis.get(song_id)
+    if cached_data:
+        cached_data_json = json.loads(cached_data)
+        return {
+            "message": "Song Found(Cached)",
+            "data": cached_data_json
+        }
 
     if not find_song:
         raise not_found_error("Song")
@@ -85,21 +97,24 @@ async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)
     num_ratings = len(find_song.ratings) if find_song.ratings else 0
     average_rating = (total_ratings / num_ratings) if num_ratings != 0 else 0
 
+    song_data = {
+        "id": find_song.id,
+        "title": find_song.title,
+        "artist": find_song.artist,
+        "album": find_song.album,
+        "genre": find_song.genre,
+        "length": find_song.length,
+        "ratings": {
+            "total": num_ratings,
+            "avg": average_rating,
+        },
+        "user_rating": user_rating.rating if user_rating else 0,
+    }
+    redis.set(song_id, json.dumps(song_data, cls=CustomJSONEncoder))
+
     return {
         "message": "Song Found!",
-        "data": {
-            "id": find_song.id,
-            "title": find_song.title,
-            "artist": find_song.artist,
-            "album": find_song.album,
-            "genre": find_song.genre,
-            "length": find_song.length,
-            "ratings": {
-                "total": num_ratings,
-                "avg": average_rating,
-            },
-            "user_rating": user_rating.rating if user_rating else 0,
-        },
+        "data": song_data
     }
 
 
@@ -108,7 +123,7 @@ async def get_song(request: Request, song_id: str, db: Session = Depends(get_db)
     dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def update_song(song_id: str, song: SongSchema, db: Session = Depends(get_db)):
+async def update_song(song_id: str, song: SongSchema, db: Session = Depends(get_db), redis: redis.StrictRedis = Depends(redis_manager.get_redis_instance)):
     """
     Updates the song with the given id.
     """
@@ -139,6 +154,10 @@ async def update_song(song_id: str, song: SongSchema, db: Session = Depends(get_
 
         es.update(index="songs", id=find_song.id, body={"doc": song_document})
 
+        cached_data = redis.get(song_id)
+        if cached_data:
+            redis.set(song_id, json.dumps(song_document, cls=CustomJSONEncoder))
+
         return {"message": "Song Updated Successfully!", "data": find_song}
     except Exception as e:
         raise handle_exception(e)
@@ -149,7 +168,7 @@ async def update_song(song_id: str, song: SongSchema, db: Session = Depends(get_
     dependencies=[Depends(authenticate_admin)],
     status_code=status.HTTP_200_OK,
 )
-async def delete_song(song_id: str, db: Session = Depends(get_db)):
+async def delete_song(song_id: str, db: Session = Depends(get_db), redis: redis.StrictRedis = Depends(redis_manager.get_redis_instance)):
     """
     Deletes the song with the given id.
     """
@@ -171,6 +190,8 @@ async def delete_song(song_id: str, db: Session = Depends(get_db)):
     try:
         db.delete(find_song)
         db.commit()
+
+        redis.delete(song_id)
 
         es.delete_by_query(index="ratings", body=del_query)
         es.update_by_query(index="playlists", body=del_playlist_song_query)
