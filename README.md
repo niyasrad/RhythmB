@@ -15,6 +15,9 @@ RhythmB is a music streaming service that allows users to listen to their favori
 - [Backing up Elasticsearch](#backing-up-elasticsearch)
 - [Screenshots](#screenshots)
 - [About Dataset](#more-about-the-dataset)
+- [K8s Deployment & Services](#k8s-deployment--services)
+- [Redis Caching](#redis-caching)
+- [Helm Chart for K8s](#helm-chart-for-k8s)
 
 
 ## Tech Stack, Tools and Libraries
@@ -457,6 +460,44 @@ If you have any issues, you can check the logs using,
 
 ```bash
 kubectl describe pods
+```
+
+## Helm Chart for K8s
+
+Helm is a package manager for Kubernetes. It is the best way to find, share, and use software built for Kubernetes. Helm is a tool that streamlines installing and managing Kubernetes applications. Think of it like apt/yum/homebrew for Kubernetes.
+
+- Frontend - Deployment, Service
+- Backend - Deployment, Service
+- Redis - Deployment, Service
+- Postgres - Deployment, Service, PV, PV-Claim
+
+To use the helm chart, install helm in your local machine, and run the following commands,
+
+```bash
+helm install rhythmb ./helm-rhythmb/helm-rhythmb-0.1.0.tgz
+```
+
+You can edit the `values.yaml` file in the `helm-rhythmb` folder to change the values, and the number of replicas, and other options. But if you're running locally, it's preferred to use the default values.
+
+If you did not make any changes to the `values.yaml` file, you can use the following command to install the helm chart,
+
+```bash
+helm package ./helm-rhythmb
+```
+
+This will create a `.tgz` file, which you can use to install the helm chart.
+
+To check the status of the helm chart, use the following command,
+
+```bash
+helm ls
+```
+
+To check the status of the pods, and services, use the following command,
+
+```bash
+kubectl get pods
+kubectl get services
 ```
 
 
