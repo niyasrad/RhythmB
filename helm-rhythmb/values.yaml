@@ -1,0 +1,72 @@
+frontend:
+  enabled: true
+  service:
+    port: 80
+    targetPort: 80
+    type: NodePort
+  deployment:
+    replicas: 1
+  image:
+    repository: rhythmb-frontend
+    tag: latest
+    pullPolicy: Never
+  container:
+    port: 80
+  
+backend:
+  service:
+    port: 8000
+    targetPort: 8000
+    type: ClusterIP
+  deployment:
+    replicas: 2
+  image:
+    repository: rhythmb-backend
+    tag: latest
+    pullPolicy: Never
+  container:
+    port: 8000
+
+
+redis:
+  service:
+    port: 6379
+    targetPort: 6379
+    type: ClusterIP
+  image:
+    repository: rhythmb-redis
+    tag: latest
+    pullPolicy: Never
+  container:
+    port: 6379
+
+postgres:
+  persistentVolume:
+    capacity: 512Mi
+    volumeMode: Filesystem
+    accessModes: ReadWriteOnce
+    reclaimPolicy: Retain
+    storageClassName: manual
+    hostPath: /var/tmp/hostpath-provisioner/postgresql/data
+
+  volumeMounts:
+    name: postgres-storage
+    mountPath: /var/tmp/hostpath-provisioner/postgresql/data
+
+  persistentVolumeClaim:
+    accessModes: ReadWriteOnce
+    storageClassName: manual
+    storageRequest: 512Mi
+
+  image:
+    repository: rhythmb-postgres
+    tag: latest
+    pullPolicy: Never
+
+  container:
+    port: 5432
+
+  service:
+    port: 5432
+    targetPort: 5432
+    type: ClusterIP
