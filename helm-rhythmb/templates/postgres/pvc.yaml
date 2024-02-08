@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - {{ .Values.postgres.persistentVolumeClaim.accessModes }}
+  storageClassName: {{ .Values.postgres.persistentVolumeClaim.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.postgres.persistentVolumeClaim.storageRequest }}
+  selector:
+    matchLabels:
+      app: postgres
